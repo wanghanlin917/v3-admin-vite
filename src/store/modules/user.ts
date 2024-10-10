@@ -5,16 +5,22 @@ import { useTagsViewStore } from "./tags-view"
 import { useSettingsStore } from "./settings"
 import { getToken, removeToken, setToken } from "@/utils/cache/cookies"
 import { resetRouter } from "@/router"
-import { loginApi, getUserInfoApi, mobileLoginApi } from "@/api/login"
-import { type LoginRequestData, type MobileLoginRequestData } from "@/api/login/types/login"
+import { loginApi, getUserInfoApi, mobileLoginApi, SendSmsApi } from "@/api/login"
+import { type LoginRequestData, type MobileLoginRequestData, type SendSmsRequestData } from "@/api/login/types/login"
 import { registerApi } from "@/api/register"
 import { type RegisterRequestData } from "@/api/register/types/register"
 import routeSettings from "@/config/route"
+import { url } from "inspector"
 
 export const useUserStore = defineStore("user", () => {
   const token = ref<string>(getToken() || "")
   const roles = ref<string[]>([])
   const username = ref<string>("")
+  const id = ref<number>(10)
+  const type = ref<number>(0)
+  const email = ref<string>("")
+  const mobile = ref<string>("")
+  const register_time = ref<string>("")
 
   const tagsViewStore = useTagsViewStore()
   const settingsStore = useSettingsStore()
@@ -24,7 +30,13 @@ export const useUserStore = defineStore("user", () => {
     const { data } = await loginApi({ username, password })
     setToken(data.token)
     token.value = data.token
+    id.value = data.id
   }
+  // 发送验证码
+  const sendsms = async ({ mobile, username }: SendSmsRequestData) => {
+    await SendSmsApi({ mobile, username })
+  }
+
   // 手机号登录
   const mobilelogin = async ({ mobile, code }: MobileLoginRequestData) => {
     const { data } = await mobileLoginApi({ mobile, code })
@@ -32,14 +44,21 @@ export const useUserStore = defineStore("user", () => {
     token.value = data.token
   }
   // 注册
-  const register = async ({ username, email, password, confirmPassword }: RegisterRequestData) => {
-    const { data } = await registerApi({ username, email, password, confirmPassword })
+  const register = async ({ username, mobile, code, email, password, confirmPassword }: RegisterRequestData) => {
+    const { data } = await registerApi({ username, mobile, code, email, password, confirmPassword })
     console.log(data)
   }
   /** 获取用户详情 */
-  const getInfo = async () => {
-    const { data } = await getUserInfoApi()
+  const getInfo = async (i: number) => {
+    const { data } = await getUserInfoApi(i)
+    console.log(data)
+    console.log(data.email)
     username.value = data.username
+    email.value = data.email
+    id.value = data.id
+    mobile.value = data.mobile
+    register_time.value = data.register_time
+    type.value = data.type
     // 验证返回的 roles 是否为一个非空数组，否则塞入一个没有任何作用的默认角色，防止路由守卫逻辑进入无限循环
     roles.value = data.roles?.length > 0 ? data.roles : routeSettings.defaultRoles
   }
@@ -73,7 +92,24 @@ export const useUserStore = defineStore("user", () => {
     }
   }
 
-  return { token, roles, username, login, register, getInfo, mobilelogin, changeRoles, logout, resetToken }
+  return {
+    token,
+    roles,
+    username,
+    id,
+    email,
+    mobile,
+    register_time,
+    type,
+    login,
+    sendsms,
+    register,
+    getInfo,
+    mobilelogin,
+    changeRoles,
+    logout,
+    resetToken
+  }
 })
 
 /** 在 setup 外使用 */

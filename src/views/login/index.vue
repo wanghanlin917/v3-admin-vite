@@ -4,6 +4,8 @@ import { useRouter } from "vue-router"
 import { useUserStore } from "@/store/modules/user"
 import { type FormInstance } from "element-plus"
 import { type LoginRequestData, type MobileLoginRequestData } from "@/api/login/types/login"
+// import { SendSmsResponseData } from "@/api/login/types/login"
+// import { log } from "console"
 const router = useRouter()
 /** 登录按钮 Loading */
 const loading = ref(false)
@@ -12,8 +14,8 @@ const activeTab = ref("account")
 const userRef = ref<FormInstance | null>(null)
 const mobileRef = ref<FormInstance | null>(null)
 const accountForm = ref<LoginRequestData>({
-  username: "admin",
-  password: "12345678"
+  username: "大和药业",
+  password: "123456"
 })
 const accountError = ref<LoginRequestData>({
   username: "",
@@ -22,7 +24,7 @@ const accountError = ref<LoginRequestData>({
 
 // 手机号登录
 const mobileForm = ref<MobileLoginRequestData>({
-  mobile: "",
+  mobile: "13183066336",
   code: ""
 })
 const btnSmsText = ref<string>("发送验证码")
@@ -36,7 +38,7 @@ const login = (type: string) => {
         useUserStore()
           .login(accountForm.value)
           .then(() => {
-            console.log(accountForm.value)
+            // console.log(accountForm.value)
             router.push({ path: "/" })
             console.log("成功")
           })
@@ -54,7 +56,7 @@ const login = (type: string) => {
 
     // })
   } else if (type == "mobile") {
-    console.log("mobule")
+    console.log("mobile")
     mobileRef.value?.validate((valid: boolean, fields) => {
       if (valid) {
         loading.value = true
@@ -78,18 +80,31 @@ const login = (type: string) => {
 }
 
 const sendCode = (): void => {
-  btnSmsdisabled.value = true
-  let n: number = 5
-  const interval: number = window.setInterval(() => {
-    n -= 1
-    btnSmsText.value = `${n}秒后重发`
-    if (n < 1) {
-      btnSmsText.value = "重新发送"
-      // 停止计时器
-      window.clearInterval(interval)
-      btnSmsdisabled.value = false
+  mobileRef.value?.validateField("mobile", (valid: boolean) => {
+    if (valid) {
+      useUserStore()
+        .sendsms({ mobile: mobileForm.value.mobile })
+        .then(() => {
+          btnSmsdisabled.value = true
+          let n: number = 5
+          const interval: number = window.setInterval(() => {
+            n -= 1
+            btnSmsText.value = `${n}秒后重发`
+            if (n < 1) {
+              btnSmsText.value = "重新发送"
+              // 停止计时器
+              window.clearInterval(interval)
+              btnSmsdisabled.value = false
+            }
+          }, 1000)
+        })
+        .catch(() => {
+          console.log("发送失败")
+        })
+    } else {
+      console.log("发送失败")
     }
-  }, 1000)
+  })
 }
 </script>
 

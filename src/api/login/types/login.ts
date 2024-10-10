@@ -1,3 +1,5 @@
+import { emit } from "process"
+
 export interface LoginRequestData {
   /** admin 或 editor */
   username: string
@@ -6,13 +8,33 @@ export interface LoginRequestData {
   /** 验证码 */
   // code: string
 }
-export interface MobileLoginRequestData {
+
+// 发送验证码校验手机号位数
+export interface SendSmsRequestData {
   mobile: string
-  code: string
+  username?: string
 }
 
-export type LoginCodeResponseData = ApiResponseData<string>
+// 手机号登录
+export interface MobileLoginRequestData {
+  mobile: string
+  code?: string
+}
 
-export type LoginResponseData = ApiResponseData<{ token: string }>
+// export type LoginCodeResponseData = ApiResponseData<string>
 
-export type UserInfoResponseData = ApiResponseData<{ username: string; roles: string[] }>
+export type LoginResponseData = ApiResponseData<{
+  id: number
+  token: string
+  username: string
+}>
+export type SendSmsResponseData = ApiResponseData<{ mobile: string }>
+export type UserInfoResponseData = ApiResponseData<{
+  id: number
+  username: string
+  email: "sting"
+  mobile: "string"
+  register_time: "string"
+  roles: string[]
+  type: number
+}>

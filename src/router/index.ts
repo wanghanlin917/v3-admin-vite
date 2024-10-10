@@ -69,46 +69,93 @@ export const constantRoutes: RouteRecordRaw[] = [
     ]
   },
   {
-    path: "/unocss",
+    path: "/users",
     component: Layouts,
-    redirect: "/unocss/index",
+    redirect: "basic",
+    name: "Users",
+    meta: {
+      title: "会员中心",
+      alwaysShow: true,
+      elIcon: "User"
+    },
     children: [
       {
-        path: "index",
-        component: () => import("@/views/unocss/index.vue"),
-        name: "UnoCSS",
+        path: "basic",
+        component: () => import("@/views/front/Basic.vue"),
+        name: "Basic",
         meta: {
-          title: "UnoCSS",
-          svgIcon: "unocss"
+          title: "基本信息"
         }
+      },
+      {
+        path: "auth",
+        component: () => import("@/views/front/Auth.vue"),
+        name: "Auth",
+        meta: {
+          title: "账号认证"
+        }
+      },
+      {
+        path: "/edit_user",
+        name: "Edit",
+        component: () => import("@/views/front/Edit.vue")
       }
     ]
   },
   {
-    path: "/link",
+    path: "/order",
+    component: Layouts,
+    redirect: "pub",
+    name: "Order",
     meta: {
-      title: "外链",
-      svgIcon: "link"
+      title: "运单中心",
+      alwaysShow: true,
+      elIcon: "Van"
     },
     children: [
       {
-        path: "https://juejin.cn/post/7089377403717287972",
-        component: () => {},
-        name: "Link1",
+        path: "pub",
+        component: () => import("@/views/order/PubView.vue"),
+        name: "Pub",
         meta: {
-          title: "中文文档"
+          title: "发布运单"
         }
       },
       {
-        path: "https://juejin.cn/column/7207659644487139387",
-        component: () => {},
-        name: "Link2",
+        path: "publist",
+        component: () => import("@/views/order/PubListView.vue"),
+        name: "PubList",
         meta: {
-          title: "新手教程"
+          title: "运单管理"
         }
       }
     ]
   },
+  // {
+  //   path: "/link",
+  //   meta: {
+  //     title: "外链",
+  //     svgIcon: "link"
+  //   },
+  //   children: [
+  //     {
+  //       path: "https://juejin.cn/post/7089377403717287972",
+  //       component: () => {},
+  //       name: "Link1",
+  //       meta: {
+  //         title: "中文文档"
+  //       }
+  //     },
+  //     {
+  //       path: "https://juejin.cn/column/7207659644487139387",
+  //       component: () => {},
+  //       name: "Link2",
+  //       meta: {
+  //         title: "新手教程"
+  //       }
+  //     }
+  //   ]
+  // },
   {
     path: "/table",
     component: Layouts,

@@ -9,7 +9,7 @@ import routeSettings from "@/config/route"
 import isWhiteList from "@/config/white-list"
 import NProgress from "nprogress"
 import "nprogress/nprogress.css"
-
+// import { log } from "console"
 const { setTitle } = useTitle()
 NProgress.configure({ showSpinner: false })
 
@@ -37,9 +37,13 @@ router.beforeEach(async (to, _from, next) => {
 
   // 否则要重新获取权限角色
   try {
-    await userStore.getInfo()
+    const a = await userStore.getInfo(userStore.id)
+    console.log(a)
+
     // 注意：角色必须是一个数组！ 例如: ["admin"] 或 ["developer", "editor"]
     const roles = userStore.roles
+    console.log(roles)
+
     // 生成可访问的 Routes
     routeSettings.dynamic ? permissionStore.setRoutes(roles) : permissionStore.setAllRoutes()
     // 将 "有访问权限的动态路由" 添加到 Router 中

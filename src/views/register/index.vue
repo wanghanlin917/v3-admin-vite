@@ -9,6 +9,8 @@ const router = useRouter()
 const loading = ref(false)
 const registerForm = ref<RegisterRequestData>({
   username: "jk1997",
+  mobile: "15863666666",
+  code: "",
   email: "12345678@sina.com",
   password: "123",
   confirmPassword: "123"
@@ -20,6 +22,9 @@ const validatePassword = (rule: any, value: any, callback: any) => {
     callback()
   }
 }
+const btnSmsText = ref<string>("发送验证码")
+const btnSmsdisabled = ref<boolean>(false)
+
 const registerFormRef = ref<FormInstance | null>(null)
 const register = () => {
   loading.value = true
@@ -41,6 +46,35 @@ const register = () => {
     }
   })
 }
+
+// 发送验证码
+const sendCode = (): void => {
+  registerFormRef.value?.validateField("mobile", (valid: boolean) => {
+    if (valid) {
+      useUserStore()
+        .sendsms({ mobile: registerForm.value.mobile, username: registerForm.value.username })
+        .then(() => {
+          btnSmsdisabled.value = true
+          let n: number = 5
+          const interval: number = window.setInterval(() => {
+            n -= 1
+            btnSmsText.value = `${n}秒后重发`
+            if (n < 1) {
+              btnSmsText.value = "重新发送"
+              // 停止计时器
+              window.clearInterval(interval)
+              btnSmsdisabled.value = false
+            }
+          }, 1000)
+        })
+        .catch(() => {
+          console.log("发送失败")
+        })
+    } else {
+      console.log("发送失败")
+    }
+  })
+}
 </script>
 <template>
   <div class="register-container">
@@ -52,6 +86,13 @@ const register = () => {
         :rules="[{ required: true, message: '请输入用户名', trigger: 'blur' }]"
       >
         <el-input v-model="registerForm.username" />
+      </el-form-item>
+      <el-form-item
+        label="手机号码"
+        prop="mobile"
+        :rules="[{ required: true, message: '请输入手机号码', trigger: 'blur' }]"
+      >
+        <el-input v-model="registerForm.mobile" />
       </el-form-item>
       <el-form-item
         label="邮箱"
@@ -76,6 +117,12 @@ const register = () => {
       >
         <el-input v-model="registerForm.confirmPassword" type="password" />
       </el-form-item>
+      <el-form-item label="验证码" prop="code" :rules="[{ required: true, message: '请输入验证码', trigger: 'blur' }]">
+        <div class="code-input">
+          <el-input v-model="registerForm.code" class="code-input-field" placeholder="验证码" />
+          <el-button :disabled="btnSmsdisabled" class="send-code-btn" @click="sendCode">{{ btnSmsText }}</el-button>
+        </div>
+      </el-form-item>
       <el-button class="registerBut" :loading="loading" type="primary" @click="register">注册</el-button>
     </el-form>
     <div class="login-link">
@@ -98,6 +145,17 @@ const register = () => {
     display: flow-root;
     .registerBut {
       float: right;
+    }
+    .code-input {
+      display: flex;
+      align-items: center;
+      .code-input-field {
+        flex: 1; /* 使输入框填满剩余空间 */
+        margin-right: 10px; /* 输入框和按钮之间的间距 */
+      }
+      .send-code-btn {
+        width: 120px; /* 设置发送按钮宽度 */
+      }
     }
   }
 }
