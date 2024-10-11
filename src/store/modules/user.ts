@@ -49,8 +49,8 @@ export const useUserStore = defineStore("user", () => {
     console.log(data)
   }
   /** 获取用户详情 */
-  const getInfo = async (i: number) => {
-    const { data } = await getUserInfoApi(i)
+  const getInfo = async () => {
+    const { data } = await getUserInfoApi(id.value)
     console.log(data)
     console.log(data.email)
     username.value = data.username

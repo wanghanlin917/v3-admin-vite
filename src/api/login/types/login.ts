@@ -1,5 +1,3 @@
-import { emit } from "process"
-
 export interface LoginRequestData {
   /** admin 或 editor */
   username: string

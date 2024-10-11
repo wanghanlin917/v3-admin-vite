@@ -39,7 +39,7 @@ export function mobileLoginApi(data: Login.MobileLoginRequestData) {
 /** 获取用户详情 */
 export function getUserInfoApi(id: number) {
   return request<Login.UserInfoResponseData>({
-    url: `users/info/${id}/`,
+    url: `users/info/${id}`,
     method: "get"
   })
 }
