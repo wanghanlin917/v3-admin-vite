@@ -22,17 +22,17 @@ export interface MobileLoginRequestData {
 // export type LoginCodeResponseData = ApiResponseData<string>
 
 export type LoginResponseData = ApiResponseData<{
-  id: number
+  id: string
   token: string
   username: string
 }>
 export type SendSmsResponseData = ApiResponseData<{ mobile: string }>
 export type UserInfoResponseData = ApiResponseData<{
-  id: number
+  id: string
   username: string
   email: "sting"
   mobile: "string"
-  register_time: "string"
+  ctime: "string"
   roles: string[]
-  type: number
+  auth_type: number
 }>

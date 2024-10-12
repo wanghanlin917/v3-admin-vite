@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, ref, ComputedRef } from "vue"
+import { ref } from "vue"
 import { useUserStore } from "@/store/modules/user"
+import DialogVue from "./components/Dialog.vue"
 // import { register } from "module"
 // import { userInfo } from "os"
 
@@ -8,7 +9,7 @@ const user = useUserStore()
 // 响应式数据
 const userInfo = ref({
   id: user.id,
-  registrationDate: "1111",
+  registrationDate: user.ctime,
   username: user.username,
   phone: `已绑定 ${user.mobile}`,
   email: user.email,
@@ -16,18 +17,12 @@ const userInfo = ref({
   avatar: "https://via.placeholder.com/100" // 用户头像占位符
 })
 const authList = ref<string[]>(["未认证", "认证中", "已认证", "认证失败"])
-const statusType: ComputedRef<string> = computed(() => {
-  switch (userInfo.value.type) {
-    case 1:
-      return "info"
-    case 2:
-      return "warning"
-    case 3:
-      return "success"
-    default:
-      return "danger"
-  }
-})
+const NameDialog = ref(false)
+// const formLabelWidth = "20px"
+// const dialogFormVisible = ref<boolean>(false)
+// const userForm = ref({
+//   name: ""
+// })
 </script>
 <template>
   <el-card class="elContaint">
@@ -43,7 +38,14 @@ const statusType: ComputedRef<string> = computed(() => {
       <div class="info">
         <p><strong>用户ID:</strong> {{ userInfo.id }}</p>
         <p><strong>注册时间:</strong> {{ userInfo.registrationDate }}</p>
-        <el-tag size="small" :type="statusType" style="margin-right: 20px">{{ authList[userInfo.type - 1] }}</el-tag>
+        <el-tag
+          size="small"
+          :type="
+            userInfo.type === 1 ? 'info' : userInfo.type === 2 ? 'warning' : userInfo.type === 3 ? 'success' : 'danger'
+          "
+          style="margin-right: 20px"
+          >{{ authList[userInfo.type - 1] }}</el-tag
+        >
         <el-link v-if="userInfo.type === 1"><router-link to="/users/auth">点击实名认证</router-link></el-link>
       </div>
     </div>
@@ -57,8 +59,8 @@ const statusType: ComputedRef<string> = computed(() => {
         </el-col>
         <el-col :span="15">{{ userInfo.username }}</el-col>
         <el-col :span="4"
-          ><el-link href="#"
-            ><el-icon><Edit /></el-icon>修改</el-link
+          ><el-button :text="true" @click="NameDialog = true"
+            ><el-icon><Edit /></el-icon>修改</el-button
           ></el-col
         >
       </el-row>
@@ -72,8 +74,8 @@ const statusType: ComputedRef<string> = computed(() => {
         </el-col>
         <el-col :span="15">{{ userInfo.phone }}</el-col>
         <el-col :span="4">
-          <el-link href="#">
-            <el-icon><Edit /></el-icon>修改</el-link
+          <el-button :text="true">
+            <el-icon><Edit /></el-icon>修改</el-button
           >
         </el-col>
       </el-row>
@@ -86,8 +88,8 @@ const statusType: ComputedRef<string> = computed(() => {
         </el-col>
         <el-col :span="15">{{ userInfo.email }}</el-col>
         <el-col :span="4">
-          <el-link href="#">
-            <el-icon><Edit /></el-icon>修改</el-link
+          <el-button :text="true">
+            <el-icon><Edit /></el-icon>修改</el-button
           >
         </el-col>
       </el-row>
@@ -98,6 +100,7 @@ const statusType: ComputedRef<string> = computed(() => {
       <el-button type="primary" size="large">退出登录</el-button>
     </div>
   </el-card>
+  <DialogVue :message="NameDialog" />
 </template>
 
 <style scoped lang="scss">

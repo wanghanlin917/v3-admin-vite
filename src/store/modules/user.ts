@@ -3,7 +3,7 @@ import store from "@/store"
 import { defineStore } from "pinia"
 import { useTagsViewStore } from "./tags-view"
 import { useSettingsStore } from "./settings"
-import { getToken, removeToken, setToken } from "@/utils/cache/cookies"
+import { getToken, removeToken, setToken, getId, setId, removeId } from "@/utils/cache/cookies"
 import { resetRouter } from "@/router"
 import { loginApi, getUserInfoApi, mobileLoginApi, SendSmsApi } from "@/api/login"
 import { type LoginRequestData, type MobileLoginRequestData, type SendSmsRequestData } from "@/api/login/types/login"
@@ -16,11 +16,11 @@ export const useUserStore = defineStore("user", () => {
   const token = ref<string>(getToken() || "")
   const roles = ref<string[]>([])
   const username = ref<string>("")
-  const id = ref<number>(10)
+  const id = ref<string>(getId() || "")
   const type = ref<number>(0)
   const email = ref<string>("")
   const mobile = ref<string>("")
-  const register_time = ref<string>("")
+  const ctime = ref<string>("")
 
   const tagsViewStore = useTagsViewStore()
   const settingsStore = useSettingsStore()
@@ -57,8 +57,8 @@ export const useUserStore = defineStore("user", () => {
     email.value = data.email
     id.value = data.id
     mobile.value = data.mobile
-    register_time.value = data.register_time
-    type.value = data.type
+    ctime.value = data.ctime
+    type.value = data.auth_type
     // 验证返回的 roles 是否为一个非空数组，否则塞入一个没有任何作用的默认角色，防止路由守卫逻辑进入无限循环
     roles.value = data.roles?.length > 0 ? data.roles : routeSettings.defaultRoles
   }
@@ -99,7 +99,7 @@ export const useUserStore = defineStore("user", () => {
     id,
     email,
     mobile,
-    register_time,
+    ctime,
     type,
     login,
     sendsms,
