@@ -94,11 +94,6 @@ export const constantRoutes: RouteRecordRaw[] = [
         meta: {
           title: "账号认证"
         }
-      },
-      {
-        path: "/edit_user",
-        name: "Edit",
-        component: () => import("@/views/front/Edit.vue")
       }
     ]
   },

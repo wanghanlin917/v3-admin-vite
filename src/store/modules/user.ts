@@ -10,7 +10,7 @@ import { type LoginRequestData, type MobileLoginRequestData, type SendSmsRequest
 import { registerApi } from "@/api/register"
 import { type RegisterRequestData } from "@/api/register/types/register"
 import routeSettings from "@/config/route"
-import { url } from "inspector"
+// import { url } from "inspector"
 
 export const useUserStore = defineStore("user", () => {
   const token = ref<string>(getToken() || "")
@@ -29,6 +29,7 @@ export const useUserStore = defineStore("user", () => {
   const login = async ({ username, password }: LoginRequestData) => {
     const { data } = await loginApi({ username, password })
     setToken(data.token)
+    setId(data.id)
     token.value = data.token
     id.value = data.id
   }
@@ -73,6 +74,8 @@ export const useUserStore = defineStore("user", () => {
   /** 登出 */
   const logout = () => {
     removeToken()
+    removeId()
+    id.value = ""
     token.value = ""
     roles.value = []
     resetRouter()
@@ -81,6 +84,8 @@ export const useUserStore = defineStore("user", () => {
   /** 重置 Token */
   const resetToken = () => {
     removeToken()
+    removeId()
+    id.value = ""
     token.value = ""
     roles.value = []
   }
