@@ -94,9 +94,15 @@ export const constantRoutes: RouteRecordRaw[] = [
         meta: {
           title: "账号认证"
         }
+      },
+      {
+        path: "/auth_edit",
+        component: () => import("@/views/front/AuthEdit.vue"),
+        name: "AuthEdit"
       }
     ]
   },
+
   {
     path: "/order",
     component: Layouts,

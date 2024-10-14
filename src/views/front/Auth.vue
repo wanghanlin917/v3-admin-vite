@@ -27,13 +27,14 @@ const state = ref<CompanyRequestData>({
             >{{ authList[user.type - 1] }}</el-tag
           >
         </div>
-        <!-- <router-link :to="{ name: 'AuthEdit' }" style="text-decoration: none"> -->
-        <el-button type="primary">编辑</el-button>
-        <!-- </router-link> -->
+        <router-link :to="{ name: 'AuthEdit' }" style="text-decoration: none">
+          <el-button type="primary">编辑</el-button>
+        </router-link>
       </div>
     </template>
 
     <el-alert
+      v-if="user.type == 4"
       type="error"
       title="审核失败"
       description="more text descriptionmore text descriptionmore text descriptionmore text descriptionmore text description"
