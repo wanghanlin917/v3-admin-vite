@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue"
-import { CompanyRequestData, CompanyEditRequestData } from "@/api/auth/type/auth"
+import { CompanyRequestData, CompanyEditRequestData, UploadResponse } from "@/api/auth/type/auth"
 import { ElMessage } from "element-plus"
 const dialogLicenceVisible = ref<boolean>(false)
 const state = ref<CompanyEditRequestData>({
@@ -25,6 +25,8 @@ const error = ref<CompanyRequestData>({
   legal_identity_back: ""
 })
 
+const imageUploadUrl = ref<string>("")
+
 const beforeImageUpload = (file: { type: string; size: number }) => {
   const isPNG = file.type === "image/png"
   const isLt2M = file.size / 1024 / 1024 < 2
@@ -41,8 +43,9 @@ const removeLicenceImage = () => {
   state.value.licence_path_url = ""
   state.value.licence_path = ""
 }
-const uploadSuccessWrapper = (fieldName: any) => {
-  function imageUploadSuccess(res: any) {
+
+const uploadSuccessWrapper = (fieldName: keyof CompanyEditRequestData) => {
+  function imageUploadSuccess(res: UploadResponse) {
     if (res.code === 0) {
       console.log(fieldName, res)
       // 1.图片地址+返回时添加
@@ -50,8 +53,8 @@ const uploadSuccessWrapper = (fieldName: any) => {
       // {"code":0,"data":{"url":"/media/uploads/2022/04/01/2_nO3mqV7.jpeg"}}
       // userModel.img = response.data.url;
       // previewImgUrl.value = response.data.abs_url;
-      state.value.`${fieldName}` = res.data.url
-      state.value[fieldName + "_url"] = res.data.abs_url
+      state.value[fieldName] = res.data.url
+      state.value[`${fieldName}_url` as keyof CompanyEditRequestData] = res.data.abs_url
     } else {
       ElMessage.error("上传失败：" + res.error)
     }
@@ -80,12 +83,12 @@ const uploadSuccessWrapper = (fieldName: any) => {
           <el-row :gutter="30">
             <el-col :span="12">
               <el-form-item style="margin-top: 24px" :error="error.title" label="企业名称">
-                <el-input v-model="state.title" placeholder="企业名称"></el-input>
+                <el-input v-model="state.title" placeholder="企业名称" />
               </el-form-item>
             </el-col>
             <el-col :span="12">
               <el-form-item style="margin-top: 24px" :error="error.unique_id" label="统一社会信用代码">
-                <el-input v-model="state.unique_id" placeholder="统一社会信用代码"></el-input>
+                <el-input v-model.trim="state.unique_id" autocomplete="off" placeholder="统一社会信用代码" />
               </el-form-item>
             </el-col>
           </el-row>
@@ -145,12 +148,12 @@ const uploadSuccessWrapper = (fieldName: any) => {
           <el-row :gutter="30">
             <el-col :span="12">
               <el-form-item style="margin-top: 24px" :error="error.legal_person" label="法人姓名">
-                <el-input v-model="state.legal_person" placeholder="法人姓名"></el-input>
+                <el-input v-model="state.legal_person" placeholder="法人姓名" />
               </el-form-item>
             </el-col>
             <el-col :span="12">
               <el-form-item style="margin-top: 24px" :error="error.legal_identity" label="法人身份证">
-                <el-input v-model="state.legal_identity" placeholder="法人身份证"></el-input>
+                <el-input v-model="state.legal_identity" placeholder="法人身份证" />
               </el-form-item>
             </el-col>
           </el-row>
@@ -161,7 +164,7 @@ const uploadSuccessWrapper = (fieldName: any) => {
                 <el-upload
                   class="avatar-uploader"
                   :action="imageUploadUrl"
-                  :on-success="uploadSuccessWrapper('leader_identity_front')"
+                  :on-success="uploadSuccessWrapper('legal_identity_front')"
                   :data="{ type: 'leader_identity_front' }"
                   :show-file-list="false"
                 >
@@ -179,7 +182,7 @@ const uploadSuccessWrapper = (fieldName: any) => {
                   class="avatar-uploader"
                   :action="imageUploadUrl"
                   :data="{ type: 'leader_identity_back' }"
-                  :on-success="uploadSuccessWrapper('leader_identity_back')"
+                  :on-success="uploadSuccessWrapper('legal_identity_back')"
                   :show-file-list="false"
                 >
                   <img v-if="state.legal_identity_back" :src="state.legal_identity_back_url" class="avatar" />

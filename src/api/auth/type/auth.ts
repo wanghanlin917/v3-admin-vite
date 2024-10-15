@@ -20,6 +20,14 @@ export interface CompanyEditRequestData {
   legal_identity_back: string
   legal_identity_back_url: string
 }
+export interface UploadResponse {
+  code: number
+  data: {
+    url: string
+    abs_url: string
+  }
+  error?: string
+}
 
 export type CompanyResponseData = ApiResponseData<{
   title: string
