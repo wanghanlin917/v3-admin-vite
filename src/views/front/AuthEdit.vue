@@ -44,7 +44,10 @@ const removeLicenceImage = () => {
   state.value.licence_path = ""
 }
 
-const uploadSuccessWrapper = (fieldName: keyof CompanyEditRequestData) => {
+const uploadSuccessWrapper = (
+  fieldName: keyof CompanyEditRequestData,
+  preViewFieldName: keyof CompanyEditRequestData
+) => {
   function imageUploadSuccess(res: UploadResponse) {
     if (res.code === 0) {
       console.log(fieldName, res)
@@ -54,7 +57,7 @@ const uploadSuccessWrapper = (fieldName: keyof CompanyEditRequestData) => {
       // userModel.img = response.data.url;
       // previewImgUrl.value = response.data.abs_url;
       state.value[fieldName] = res.data.url
-      state.value[`${fieldName}_url` as keyof CompanyEditRequestData] = res.data.abs_url
+      state.value[preViewFieldName] = res.data.abs_url
     } else {
       ElMessage.error("上传失败：" + res.error)
     }
@@ -62,6 +65,7 @@ const uploadSuccessWrapper = (fieldName: keyof CompanyEditRequestData) => {
 
   return imageUploadSuccess
 }
+const doSubmit =
 </script>
 <template>
   <el-card class="authCard">
@@ -123,7 +127,7 @@ const uploadSuccessWrapper = (fieldName: keyof CompanyEditRequestData) => {
                   :multiple="false"
                   :action="imageUploadUrl"
                   :before-upload="beforeImageUpload"
-                  :on-success="uploadSuccessWrapper('licence_path')"
+                  :on-success="uploadSuccessWrapper('licence_path', 'licence_path_url')"
                 >
                   <el-icon class="el-icon--upload">
                     <upload-filled />
@@ -164,8 +168,9 @@ const uploadSuccessWrapper = (fieldName: keyof CompanyEditRequestData) => {
                 <el-upload
                   class="avatar-uploader"
                   :action="imageUploadUrl"
-                  :on-success="uploadSuccessWrapper('legal_identity_front')"
-                  :data="{ type: 'leader_identity_front' }"
+                  :on-success="uploadSuccessWrapper('legal_identity_front', 'legal_identity_front_url')"
+                  :data="{ type: 'front' }"
+                  :before-upload="beforeImageUpload"
                   :show-file-list="false"
                 >
                   <img v-if="state.legal_identity_front" :src="state.legal_identity_front_url" class="avatar" />
@@ -182,7 +187,7 @@ const uploadSuccessWrapper = (fieldName: keyof CompanyEditRequestData) => {
                   class="avatar-uploader"
                   :action="imageUploadUrl"
                   :data="{ type: 'leader_identity_back' }"
-                  :on-success="uploadSuccessWrapper('legal_identity_back')"
+                  :on-success="uploadSuccessWrapper('legal_identity_back', 'legal_identity_back_url')"
                   :show-file-list="false"
                 >
                   <img v-if="state.legal_identity_back" :src="state.legal_identity_back_url" class="avatar" />
@@ -196,7 +201,7 @@ const uploadSuccessWrapper = (fieldName: keyof CompanyEditRequestData) => {
         </div>
         <el-divider border-style="dotted" />
         <el-row justify="center" align="middle" style="height: 80px">
-          <el-button type="primary" style="width: 200px; height: 40px">提交审核</el-button>
+          <el-button type="primary" style="width: 200px; height: 40px" @click="doSubmit">提交审核</el-button>
         </el-row>
       </div>
     </el-form>
