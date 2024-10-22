@@ -65,7 +65,7 @@ const uploadSuccessWrapper = (
 
   return imageUploadSuccess
 }
-const doSubmit =
+// const doSubmit =
 </script>
 <template>
   <el-card class="authCard">
