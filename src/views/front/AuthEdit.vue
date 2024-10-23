@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref } from "vue"
+import { useUserStore } from "@/store/modules/user"
 import { CompanyRequestData, CompanyEditRequestData, UploadResponse } from "@/api/auth/type/auth"
 import { ElMessage } from "element-plus"
+
+const user = useUserStore()
 const dialogLicenceVisible = ref<boolean>(false)
 const state = ref<CompanyEditRequestData>({
   title: "",
@@ -25,7 +28,7 @@ const error = ref<CompanyRequestData>({
   legal_identity_back: ""
 })
 
-const imageUploadUrl = ref<string>("")
+const imageUploadUrl = ref<string>(`http://127.0.0.1:8000/api/v1/auth/upload/?token=${user.token}`)
 
 const beforeImageUpload = (file: { type: string; size: number }) => {
   const isPNG = file.type === "image/png"
