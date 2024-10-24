@@ -28,7 +28,7 @@ const error = ref<CompanyRequestData>({
   legal_identity_back: ""
 })
 
-const imageUploadUrl = ref<string>(`http://127.0.0.1:8000/api/v1/auth/upload/?token=${user.token}`)
+const imageUploadUrl = ref<string>(`http://127.0.0.1:8000/api/v1/auth/upload?token=${user.token}`)
 
 const beforeImageUpload = (file: { type: string; size: number }) => {
   const isPNG = file.type === "image/png"
