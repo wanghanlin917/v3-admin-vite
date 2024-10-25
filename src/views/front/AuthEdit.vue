@@ -28,7 +28,8 @@ const error = ref<CompanyRequestData>({
   legal_identity_back: ""
 })
 
-const imageUploadUrl = ref<string>(`http://127.0.0.1:8000/api/v1/auth/upload?token=${user.token}`)
+// const imageUploadUrl = ref<string>(`http://127.0.0.1:8000/api/v1/auth/upload?token=${user.token}`)
+const imageUploadUrl = ref<string>("#")
 
 const beforeImageUpload = (file: { type: string; size: number }) => {
   const isPNG = file.type === "image/png"
@@ -67,6 +68,12 @@ const uploadSuccessWrapper = (
   }
 
   return imageUploadSuccess
+}
+
+const uploadImage = (file) => {
+  console.log("hahahah")
+
+  console.log(file)
 }
 // const doSubmit =
 </script>
@@ -126,6 +133,7 @@ const uploadSuccessWrapper = (
                   style="width: 200px; height: 150px"
                   drag
                   :data="{ type: 'licence_path' }"
+                  :http-request="uploadImage"
                   :show-file-list="false"
                   :multiple="false"
                   :action="imageUploadUrl"
