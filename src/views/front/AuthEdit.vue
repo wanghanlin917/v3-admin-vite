@@ -49,7 +49,6 @@ const removeLicenceImage = () => {
   state.value.licence_path_url = ""
   state.value.licence_path = ""
 }
-
 // const uploadSuccessWrapper = (
 //   fieldName: keyof CompanyEditRequestData,
 //   preViewFieldName: keyof CompanyEditRequestData
@@ -76,16 +75,35 @@ const removeLicenceImage = () => {
 //   return imageUploadSuccess
 // }
 
-const uploadImage = async ({ file }: { file: File }) => {
-  await uploadDataApi({ file })
-    .then((res) => {
-      console.log(res)
+// const uploadImage = async ({ file }: { file: File }) => {
+//   console.log("lllll", file)
+//   await uploadDataApi({ file })
+//     .then((res) => {
+//       // state.value[fieldName] = res.data.url
+//       // state.value[preViewFieldName] = res.data.abs_url
+//       console.log(res)
 
-      ElMessage.success("成功")
-    })
-    .catch((res) => {
-      ElMessage.error(res.message)
-    })
+//       ElMessage.success("成功")
+//     })
+//     .catch((res) => {
+//       ElMessage.error(res.message)
+//     })
+// }
+const uploadImage = (fieldName: keyof CompanyEditRequestData, preViewFieldName: keyof CompanyEditRequestData) => {
+  async function imageUpload({ file }: { file: File }) {
+    await uploadDataApi({ file })
+      .then((res) => {
+        state.value[fieldName] = res.data.url
+        state.value[preViewFieldName] = res.data.abs_url
+        console.log(state.value)
+        ElMessage.success("成功")
+      })
+      .catch((res) => {
+        console.log(res)
+        ElMessage.error(res.message)
+      })
+  }
+  return imageUpload
 }
 // console.log("file", file)
 // console.log("res", res)
@@ -195,14 +213,14 @@ const uploadImage = async ({ file }: { file: File }) => {
               </el-form-item>
             </el-col>
           </el-row>
-
+          <!-- :on-success="uploadSuccessWrapper('legal_identity_front', 'legal_identity_front_url')" -->
           <el-row :gutter="30">
             <el-col :span="12">
               <el-form-item style="margin-top: 24px" :error="error.legal_identity_front" label="法人身份证人头面">
                 <el-upload
                   class="avatar-uploader"
                   :action="imageUploadUrl"
-                  :on-success="uploadSuccessWrapper('legal_identity_front', 'legal_identity_front_url')"
+                  :http-request="uploadImage('legal_identity_front', 'legal_identity_front_url')"
                   :data="{ type: 'front' }"
                   :before-upload="beforeImageUpload"
                   :show-file-list="false"
@@ -214,14 +232,14 @@ const uploadImage = async ({ file }: { file: File }) => {
                 </el-upload>
               </el-form-item>
             </el-col>
-
+            <!-- :on-success="uploadSuccessWrapper('legal_identity_back', 'legal_identity_back_url')" -->
             <el-col :span="12">
               <el-form-item style="margin-top: 24px" :error="error.legal_identity_back" label="法人身份证国徽面">
                 <el-upload
                   class="avatar-uploader"
                   :action="imageUploadUrl"
+                  :http-request="uploadImage('legal_identity_back', 'legal_identity_back_url')"
                   :data="{ type: 'leader_identity_back' }"
-                  :on-success="uploadSuccessWrapper('legal_identity_back', 'legal_identity_back_url')"
                   :show-file-list="false"
                 >
                   <img v-if="state.legal_identity_back" :src="state.legal_identity_back_url" class="avatar" />
