@@ -29,12 +29,12 @@ const resetForm = () => {
   userForm.value = { id: user.id, username: "" }
 }
 const updateMsg = () => {
-  userRef.value?.validate((valid: boolean) => {
+  userRef.value?.validate(async (valid: boolean) => {
     // console.log("update", valid)
     if (!valid) {
       return
     }
-    modifyUserApi(userForm.value).then(() => {
+    await modifyUserApi(userForm.value).then(() => {
       ElMessage.success("修改成功")
       nameShow.value = false
       user.getInfo()
@@ -49,9 +49,9 @@ const mobileForm = ref<ModifyMobileRequestData>({
 })
 const mobileRef = ref<FormInstance | null>(null)
 const updateMobile = () => {
-  mobileRef.value?.validate((valid: boolean) => {
+  mobileRef.value?.validate(async (valid: boolean) => {
     if (!valid) return
-    modifyMobileApi(mobileForm.value).then(() => {
+    await modifyMobileApi(mobileForm.value).then(() => {
       ElMessage.success("修改成功")
       mobileShow.value = false
       user.getInfo()
@@ -74,9 +74,9 @@ const resetEmailForm = () => {
   emailForm.value = { id: user.id, email: "" }
 }
 const updateEmail = () => {
-  emailRef.value?.validate((vaild: boolean) => {
+  emailRef.value?.validate(async (vaild: boolean) => {
     if (!vaild) return
-    modifyEmailApi(emailForm.value).then(() => {
+    await modifyEmailApi(emailForm.value).then(() => {
       ElMessage.success("修改成功")
       emailShow.value = false
       user.getInfo()

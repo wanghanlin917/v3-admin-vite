@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref } from "vue"
-import { useUserStore } from "@/store/modules/user"
+// import { useUserStore } from "@/store/modules/user"
 import { CompanyRequestData, CompanyEditRequestData, UploadResponse } from "@/api/auth/type/auth"
+import { uploadDataApi } from "@/api/common/index"
 import { ElMessage } from "element-plus"
+import { log } from "console"
 
-const user = useUserStore()
+// const user = useUserStore()
 const dialogLicenceVisible = ref<boolean>(false)
 const state = ref<CompanyEditRequestData>({
   title: "",
@@ -48,33 +50,55 @@ const removeLicenceImage = () => {
   state.value.licence_path = ""
 }
 
-const uploadSuccessWrapper = (
-  fieldName: keyof CompanyEditRequestData,
-  preViewFieldName: keyof CompanyEditRequestData
-) => {
-  function imageUploadSuccess(res: UploadResponse) {
-    if (res.code === 0) {
-      console.log(fieldName, res)
-      // 1.图片地址+返回时添加
-      // 2.服务器支持访问静态图片
-      // {"code":0,"data":{"url":"/media/uploads/2022/04/01/2_nO3mqV7.jpeg"}}
-      // userModel.img = response.data.url;
-      // previewImgUrl.value = response.data.abs_url;
-      state.value[fieldName] = res.data.url
-      state.value[preViewFieldName] = res.data.abs_url
-    } else {
-      ElMessage.error("上传失败：" + res.error)
-    }
-  }
+// const uploadSuccessWrapper = (
+//   fieldName: keyof CompanyEditRequestData,
+//   preViewFieldName: keyof CompanyEditRequestData
+// ) => {
+//   function imageUploadSuccess(res: UploadResponse) {
+//     console.log("xxxx", res)
+//     console.log(fieldName)
 
-  return imageUploadSuccess
+//     if (res?.code === 0) {
+//       console.log(fieldName)
+//       console.log(preViewFieldName)
+//       // 1.图片地址+返回时添加
+//       // 2.服务器支持访问静态图片
+//       // {"code":0,"data":{"url":"/media/uploads/2022/04/01/2_nO3mqV7.jpeg"}}
+//       // userModel.img = response.data.url;
+//       // previewImgUrl.value = response.data.abs_url;
+//       state.value[fieldName] = res.data.url
+//       state.value[preViewFieldName] = res.data.abs_url
+//     } else {
+//       ElMessage.error("上传失败1111" + res?.error)
+//     }
+//   }
+
+//   return imageUploadSuccess
+// }
+
+const uploadImage = async ({ file }: { file: File }) => {
+  await uploadDataApi({ file })
+    .then((res) => {
+      console.log(res)
+
+      ElMessage.success("成功")
+    })
+    .catch((res) => {
+      ElMessage.error(res.message)
+    })
 }
+// console.log("file", file)
+// console.log("res", res)
+// console.log(res)
 
-const uploadImage = (file) => {
-  console.log("hahahah")
-
-  console.log(file)
-}
+//   if (res?.code === 0) {
+//     ElMessage.success("成功")
+//   } else {
+//     ElMessage.error(res.message)
+//   }
+//   // console.log("hahahah")
+//   // console.log(file)
+// }
 // const doSubmit =
 </script>
 <template>
@@ -133,12 +157,11 @@ const uploadImage = (file) => {
                   style="width: 200px; height: 150px"
                   drag
                   :data="{ type: 'licence_path' }"
-                  :http-request="uploadImage"
+                  :http-request="uploadImage('licence_path', 'licence_path_url')"
                   :show-file-list="false"
                   :multiple="false"
                   :action="imageUploadUrl"
                   :before-upload="beforeImageUpload"
-                  :on-success="uploadSuccessWrapper('licence_path', 'licence_path_url')"
                 >
                   <el-icon class="el-icon--upload">
                     <upload-filled />
