@@ -89,9 +89,17 @@ const removeLicenceImage = () => {
 //       ElMessage.error(res.message)
 //     })
 // }
-const uploadImage = (fieldName: keyof CompanyEditRequestData, preViewFieldName: keyof CompanyEditRequestData) => {
+const uploadImage = (
+  fieldName: keyof CompanyEditRequestData,
+  preViewFieldName: keyof CompanyEditRequestData,
+  t: string
+) => {
+  console.log(t)
+
   async function imageUpload({ file }: { file: File }) {
-    await uploadDataApi({ file })
+    console.log("file", file)
+
+    await uploadDataApi({ file: file, type: t })
       .then((res) => {
         state.value[fieldName] = res.data.url
         state.value[preViewFieldName] = res.data.abs_url
@@ -174,8 +182,7 @@ const uploadImage = (fieldName: keyof CompanyEditRequestData, preViewFieldName: 
                   v-else
                   style="width: 200px; height: 150px"
                   drag
-                  :data="{ type: 'licence_path' }"
-                  :http-request="uploadImage('licence_path', 'licence_path_url')"
+                  :http-request="uploadImage('licence_path', 'licence_path_url', 'licence_path')"
                   :show-file-list="false"
                   :multiple="false"
                   :action="imageUploadUrl"
@@ -220,8 +227,7 @@ const uploadImage = (fieldName: keyof CompanyEditRequestData, preViewFieldName: 
                 <el-upload
                   class="avatar-uploader"
                   :action="imageUploadUrl"
-                  :http-request="uploadImage('legal_identity_front', 'legal_identity_front_url')"
-                  :data="{ type: 'front' }"
+                  :http-request="uploadImage('legal_identity_front', 'legal_identity_front_url', 'front')"
                   :before-upload="beforeImageUpload"
                   :show-file-list="false"
                 >
@@ -238,8 +244,7 @@ const uploadImage = (fieldName: keyof CompanyEditRequestData, preViewFieldName: 
                 <el-upload
                   class="avatar-uploader"
                   :action="imageUploadUrl"
-                  :http-request="uploadImage('legal_identity_back', 'legal_identity_back_url')"
-                  :data="{ type: 'leader_identity_back' }"
+                  :http-request="uploadImage('legal_identity_back', 'legal_identity_back_url', 'back')"
                   :show-file-list="false"
                 >
                   <img v-if="state.legal_identity_back" :src="state.legal_identity_back_url" class="avatar" />
