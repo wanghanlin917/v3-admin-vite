@@ -101,6 +101,7 @@ const uploadImage = (
 
     await uploadDataApi({ file: file, type: t })
       .then((res) => {
+        console.log("res", res)
         state.value[fieldName] = res.data.url
         state.value[preViewFieldName] = res.data.abs_url
         console.log(state.value)
