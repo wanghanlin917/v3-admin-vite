@@ -113,6 +113,7 @@ const uploadImage = (
   }
   return imageUpload
 }
+const doSubmit = () => {}
 // console.log("file", file)
 // console.log("res", res)
 // console.log(res)
