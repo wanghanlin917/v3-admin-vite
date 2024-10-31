@@ -9,6 +9,7 @@ class CacheKey {
   static readonly VISITED_VIEWS = `${SYSTEM_NAME}-visited-views-key`
   static readonly CACHED_VIEWS = `${SYSTEM_NAME}-cached-views-key`
   static readonly UID = "UID"
+  static readonly AUTH_ID = "AUTH_ID"
 }
 
 export default CacheKey

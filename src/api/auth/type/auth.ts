@@ -1,6 +1,16 @@
 export interface CompanyRequestData {
   title: string
   unique_id: string
+  licence_path_url: string
+  legal_person: string
+  legal_identity: string
+  legal_identity_front_url: string
+  legal_identity_back_url: string
+  remark: string
+}
+export interface CompanyError {
+  title: string
+  unique_id: string
   licence_path: string
   legal_person: string
   legal_identity: string

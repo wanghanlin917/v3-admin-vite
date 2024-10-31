@@ -23,3 +23,14 @@ export const setId = (id: string) => {
 export const removeId = () => {
   Cookies.remove(CacheKey.UID)
 }
+
+export const getAuthId = () => {
+  return Cookies.get(CacheKey.AUTH_ID)
+}
+
+export const setAuthId = (AuthId: string) => {
+  Cookies.set(CacheKey.AUTH_ID, AuthId)
+}
+export const removeAuthId = () => {
+  Cookies.remove(CacheKey.AUTH_ID)
+}

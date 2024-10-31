@@ -7,11 +7,12 @@ const authList = ref<string[]>(["未认证", "认证中", "已认证", "认证�
 const state = ref<CompanyRequestData>({
   title: "",
   unique_id: "",
-  licence_path: "",
+  licence_path_url: "",
   legal_person: "",
   legal_identity: "",
-  legal_identity_front: "",
-  legal_identity_back: ""
+  legal_identity_front_url: "http://127.0.0.1:8000/media/upload/20241030/id.png",
+  legal_identity_back_url: "",
+  remark: ""
 })
 </script>
 <template>
@@ -53,11 +54,11 @@ const state = ref<CompanyRequestData>({
         </el-row>
         <el-row :gutter="10" class="info-row">
           <el-col :span="4" class="row-left">营业执照</el-col>
-          <el-col :span="8" class="row-right" v-if="state.licence_path">
+          <el-col :span="8" class="row-right" v-if="state.licence_path_url">
             <el-image
               style="width: 150px; height: 100px"
-              :src="state.licence_path"
-              :preview-src-list="[state.licence_path]"
+              :src="state.licence_path_url"
+              :preview-src-list="[state.licence_path_url]"
               fit="cover"
             />
           </el-col>
@@ -77,11 +78,11 @@ const state = ref<CompanyRequestData>({
         </el-row>
         <el-row :gutter="10" class="info-row">
           <el-col :span="4" class="row-left">法人身份证头像面</el-col>
-          <el-col :span="8" class="row-right" v-if="state.legal_identity_front">
+          <el-col :span="8" class="row-right" v-if="state.legal_identity_front_url">
             <el-image
               style="width: 150px; height: 100px"
-              :src="state.legal_identity_front"
-              :preview-src-list="[state.legal_identity_front]"
+              :src="state.legal_identity_front_url"
+              :preview-src-list="[state.legal_identity_front_url]"
               fit="cover"
             />
           </el-col>
@@ -90,11 +91,11 @@ const state = ref<CompanyRequestData>({
 
         <el-row :gutter="10" class="info-row">
           <el-col :span="4" class="row-left">法人身份证国徽面</el-col>
-          <el-col :span="8" class="row-right" v-if="state.legal_identity_back">
+          <el-col :span="8" class="row-right" v-if="state.legal_identity_back_url">
             <el-image
               style="width: 150px; height: 100px"
-              :src="state.legal_identity_back"
-              :preview-src-list="[state.legal_identity_back]"
+              :src="state.legal_identity_back_url"
+              :preview-src-list="[state.legal_identity_back_url]"
               fit="cover"
             />
           </el-col>

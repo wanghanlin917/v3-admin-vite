@@ -23,6 +23,7 @@ export interface MobileLoginRequestData {
 
 export type LoginResponseData = ApiResponseData<{
   id: string
+  auth_id: string
   token: string
   username: string
 }>

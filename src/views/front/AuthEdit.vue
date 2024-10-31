@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { ref } from "vue"
-// import { useUserStore } from "@/store/modules/user"
-import { CompanyRequestData, CompanyEditRequestData, UploadResponse } from "@/api/auth/type/auth"
+import { ref, onMounted } from "vue"
+import { useUserStore } from "@/store/modules/user"
+import { CompanyEditRequestData, CompanyError } from "@/api/auth/type/auth"
 import { uploadDataApi } from "@/api/common/index"
 import { ElMessage } from "element-plus"
-import { log } from "console"
-
-// const user = useUserStore()
+import { InitDateApi } from "@/api/auth"
+const user = useUserStore()
 const dialogLicenceVisible = ref<boolean>(false)
 const state = ref<CompanyEditRequestData>({
   title: "",
@@ -20,7 +19,7 @@ const state = ref<CompanyEditRequestData>({
   legal_identity_back: "",
   legal_identity_back_url: ""
 })
-const error = ref<CompanyRequestData>({
+const error = ref<CompanyError>({
   title: "",
   unique_id: "",
   licence_path: "",
@@ -49,46 +48,6 @@ const removeLicenceImage = () => {
   state.value.licence_path_url = ""
   state.value.licence_path = ""
 }
-// const uploadSuccessWrapper = (
-//   fieldName: keyof CompanyEditRequestData,
-//   preViewFieldName: keyof CompanyEditRequestData
-// ) => {
-//   function imageUploadSuccess(res: UploadResponse) {
-//     console.log("xxxx", res)
-//     console.log(fieldName)
-
-//     if (res?.code === 0) {
-//       console.log(fieldName)
-//       console.log(preViewFieldName)
-//       // 1.图片地址+返回时添加
-//       // 2.服务器支持访问静态图片
-//       // {"code":0,"data":{"url":"/media/uploads/2022/04/01/2_nO3mqV7.jpeg"}}
-//       // userModel.img = response.data.url;
-//       // previewImgUrl.value = response.data.abs_url;
-//       state.value[fieldName] = res.data.url
-//       state.value[preViewFieldName] = res.data.abs_url
-//     } else {
-//       ElMessage.error("上传失败1111" + res?.error)
-//     }
-//   }
-
-//   return imageUploadSuccess
-// }
-
-// const uploadImage = async ({ file }: { file: File }) => {
-//   console.log("lllll", file)
-//   await uploadDataApi({ file })
-//     .then((res) => {
-//       // state.value[fieldName] = res.data.url
-//       // state.value[preViewFieldName] = res.data.abs_url
-//       console.log(res)
-
-//       ElMessage.success("成功")
-//     })
-//     .catch((res) => {
-//       ElMessage.error(res.message)
-//     })
-// }
 const uploadImage = (
   fieldName: keyof CompanyEditRequestData,
   preViewFieldName: keyof CompanyEditRequestData,
@@ -114,7 +73,16 @@ const uploadImage = (
   }
   return imageUpload
 }
+const InitRequest = async () => {
+  console.log("hahahaahah")
+
+  await InitDateApi({ auth_id: user.AuthId }).then((res) => {
+    console.log("hahahah")
+    console.log(res)
+  })
+}
 const doSubmit = () => {}
+InitRequest()
 // console.log("file", file)
 // console.log("res", res)
 // console.log(res)
@@ -128,6 +96,9 @@ const doSubmit = () => {}
 //   // console.log(file)
 // }
 // const doSubmit =
+// onMounted(() => {
+//   InitRequest()
+// })
 </script>
 <template>
   <el-card class="authCard">

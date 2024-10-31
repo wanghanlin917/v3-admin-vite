@@ -3,7 +3,17 @@ import store from "@/store"
 import { defineStore } from "pinia"
 import { useTagsViewStore } from "./tags-view"
 import { useSettingsStore } from "./settings"
-import { getToken, removeToken, setToken, getId, setId, removeId } from "@/utils/cache/cookies"
+import {
+  getToken,
+  removeToken,
+  setToken,
+  getId,
+  setId,
+  removeId,
+  getAuthId,
+  setAuthId,
+  removeAuthId
+} from "@/utils/cache/cookies"
 import { resetRouter } from "@/router"
 import { loginApi, getUserInfoApi, mobileLoginApi, SendSmsApi } from "@/api/login"
 import { type LoginRequestData, type MobileLoginRequestData, type SendSmsRequestData } from "@/api/login/types/login"
@@ -17,6 +27,7 @@ export const useUserStore = defineStore("user", () => {
   const roles = ref<string[]>([])
   const username = ref<string>("")
   const id = ref<string>(getId() || "")
+  const AuthId = ref<string>(getAuthId() || "")
   const type = ref<number>(0)
   const email = ref<string>("")
   const mobile = ref<string>("")
@@ -30,6 +41,8 @@ export const useUserStore = defineStore("user", () => {
     const { data } = await loginApi({ username, password })
     setToken(data.token)
     setId(data.id)
+    setAuthId(data.auth_id)
+    AuthId.value = data.auth_id
     token.value = data.token
     id.value = data.id
   }
@@ -75,8 +88,10 @@ export const useUserStore = defineStore("user", () => {
   const logout = () => {
     removeToken()
     removeId()
+    removeAuthId()
     id.value = ""
     token.value = ""
+    AuthId.value = ""
     roles.value = []
     resetRouter()
     _resetTagsView()
@@ -85,8 +100,10 @@ export const useUserStore = defineStore("user", () => {
   const resetToken = () => {
     removeToken()
     removeId()
+    removeAuthId()
     id.value = ""
     token.value = ""
+    AuthId.value = ""
     roles.value = []
   }
   /** 重置 Visited Views 和 Cached Views */
@@ -102,6 +119,7 @@ export const useUserStore = defineStore("user", () => {
     roles,
     username,
     id,
+    AuthId,
     email,
     mobile,
     ctime,
