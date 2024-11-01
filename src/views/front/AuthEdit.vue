@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
+import { ref } from "vue"
 import { useUserStore } from "@/store/modules/user"
 import { CompanyEditRequestData, CompanyError } from "@/api/auth/type/auth"
 import { uploadDataApi } from "@/api/common/index"
@@ -34,12 +34,12 @@ const imageUploadUrl = ref<string>("#")
 
 const beforeImageUpload = (file: { type: string; size: number }) => {
   const isPNG = file.type === "image/png"
-  const isLt2M = file.size / 1024 / 1024 < 2
+  const isLt2M = file.size / 1024 / 1024 < 4
   if (!isPNG) {
     ElMessage.error("上传图片只能是 PNG 格式!")
   }
   if (!isLt2M) {
-    ElMessage.error("上传图片大小不能超过 2MB!")
+    ElMessage.error("上传图片大小不能超过 4MB!")
   }
   return isPNG && isLt2M
 }
@@ -53,7 +53,7 @@ const uploadImage = (
   preViewFieldName: keyof CompanyEditRequestData,
   t: string
 ) => {
-  console.log(t)
+  console.log("fg", t)
 
   async function imageUpload({ file }: { file: File }) {
     console.log("file", file)
@@ -63,6 +63,10 @@ const uploadImage = (
         console.log("res", res)
         state.value[fieldName] = res.data.url
         state.value[preViewFieldName] = res.data.abs_url
+        if (t === "front") {
+          state.value.legal_person = res.data.name || ""
+          state.value.legal_identity = res.data.cardId || ""
+        }
         console.log(state.value)
         ElMessage.success("成功")
       })
@@ -76,10 +80,15 @@ const uploadImage = (
 const InitRequest = async () => {
   console.log("hahahaahah")
 
-  await InitDateApi({ auth_id: user.AuthId }).then((res) => {
-    console.log("hahahah")
-    console.log(res)
-  })
+  await InitDateApi({ auth_id: user.AuthId })
+    .then((res) => {
+      console.log("hahahah")
+      console.log("tt", res)
+    })
+    .catch((res) => {
+      console.log(res.message)
+      ElMessage.error(res)
+    })
 }
 const doSubmit = () => {}
 InitRequest()

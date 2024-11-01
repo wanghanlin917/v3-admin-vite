@@ -4,4 +4,4 @@
 //   }
 // }
 
-export type UploadResponseData = ApiResponseData<{ url: string; abs_url: string }>
+export type UploadResponseData = ApiResponseData<{ url: string; abs_url: string; name?: string; cardId?: string }>

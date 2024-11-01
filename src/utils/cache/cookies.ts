@@ -34,3 +34,5 @@ export const setAuthId = (AuthId: string) => {
 export const removeAuthId = () => {
   Cookies.remove(CacheKey.AUTH_ID)
 }
+
+export const getLice
