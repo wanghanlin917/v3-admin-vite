@@ -12,7 +12,13 @@ import {
   removeId,
   getAuthId,
   setAuthId,
-  removeAuthId
+  removeAuthId,
+  getBackUrl,
+  getFrontUrl,
+  getLicencePath,
+  removeBackUrl,
+  removeFrontUrl,
+  removeLicencePath
 } from "@/utils/cache/cookies"
 import { resetRouter } from "@/router"
 import { loginApi, getUserInfoApi, mobileLoginApi, SendSmsApi } from "@/api/login"
@@ -24,10 +30,13 @@ import routeSettings from "@/config/route"
 
 export const useUserStore = defineStore("user", () => {
   const token = ref<string>(getToken() || "")
-  const roles = ref<string[]>([])
-  const username = ref<string>("")
   const id = ref<string>(getId() || "")
   const AuthId = ref<string>(getAuthId() || "")
+  const LicencePathUrl = ref<string>(getLicencePath() || "")
+  const FrontUrl = ref<string>(getFrontUrl() || "")
+  const BackUrl = ref<string>(getBackUrl() || "")
+  const roles = ref<string[]>([])
+  const username = ref<string>("")
   const type = ref<number>(0)
   const email = ref<string>("")
   const mobile = ref<string>("")
@@ -89,6 +98,12 @@ export const useUserStore = defineStore("user", () => {
     removeToken()
     removeId()
     removeAuthId()
+    removeLicencePath()
+    removeFrontUrl()
+    removeBackUrl()
+    LicencePathUrl.value = ""
+    FrontUrl.value = ""
+    BackUrl.value = ""
     id.value = ""
     token.value = ""
     AuthId.value = ""
@@ -101,6 +116,12 @@ export const useUserStore = defineStore("user", () => {
     removeToken()
     removeId()
     removeAuthId()
+    removeLicencePath()
+    removeFrontUrl()
+    removeBackUrl()
+    LicencePathUrl.value = ""
+    FrontUrl.value = ""
+    BackUrl.value = ""
     id.value = ""
     token.value = ""
     AuthId.value = ""
@@ -131,7 +152,10 @@ export const useUserStore = defineStore("user", () => {
     mobilelogin,
     changeRoles,
     logout,
-    resetToken
+    resetToken,
+    LicencePathUrl,
+    FrontUrl,
+    BackUrl
   }
 })
 

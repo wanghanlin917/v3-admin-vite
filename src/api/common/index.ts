@@ -8,9 +8,9 @@ export function uploadDataApi(data: { file: File; type: string }) {
   fd.append("type", data.type)
   // fd.append("type", data.type)
   console.log("hahahah")
-  fd.forEach((e) => {
-    console.log("t", e)
-  })
+  // fd.forEach((e) => {
+  //   console.log("t", e)
+  // })
   return request<upload.UploadResponseData>({
     url: "auth/upload",
     method: "post",

@@ -40,7 +40,7 @@ function createService() {
       switch (code) {
         case 0:
           // 本系统采用 code === 0 来表示没有业务错误
-          console.log(apiData)
+          console.log("响应拦截器数据", apiData)
 
           return apiData
         case 401:

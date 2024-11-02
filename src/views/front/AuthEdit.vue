@@ -5,19 +5,22 @@ import { CompanyEditRequestData, CompanyError } from "@/api/auth/type/auth"
 import { uploadDataApi } from "@/api/common/index"
 import { ElMessage } from "element-plus"
 import { InitDateApi } from "@/api/auth"
+import { type FormInstance, type FormRules } from "element-plus"
+import { getLicencePath, setLicencePath, getFrontUrl, setFrontUrl, getBackUrl, setBackUrl } from "@/utils/cache/cookies"
 const user = useUserStore()
 const dialogLicenceVisible = ref<boolean>(false)
+const formRef = ref<FormInstance>()
 const state = ref<CompanyEditRequestData>({
   title: "",
   unique_id: "",
   licence_path: "",
-  licence_path_url: "",
+  licence_path_url: getLicencePath() || "",
   legal_person: "",
   legal_identity: "",
   legal_identity_front: "",
-  legal_identity_front_url: "",
+  legal_identity_front_url: getFrontUrl() || "",
   legal_identity_back: "",
-  legal_identity_back_url: ""
+  legal_identity_back_url: getBackUrl() || ""
 })
 const error = ref<CompanyError>({
   title: "",
@@ -27,6 +30,16 @@ const error = ref<CompanyError>({
   legal_identity: "",
   legal_identity_front: "",
   legal_identity_back: ""
+})
+
+const rules = ref<FormRules<typeof state>>({
+  title: [{ required: true, message: "请输入公司名称", trigger: "blur" }],
+  unique_id: [{ required: true, message: "请输入统一社会信用代码", trigger: "blur" }],
+  licence_path: [{ required: true, message: "请上传营业执照", trigger: "blur" }],
+  legal_person: [{ required: true, message: "请输入法人姓名", trigger: "blur" }],
+  legal_identity: [{ required: true, message: "请输入法人身份证号", trigger: "blur" }],
+  legal_identity_front: [{ required: true, message: "请上传身份证正面", trigger: "blur" }],
+  legal_identity_back: [{ required: true, message: "请上传身份证背面", trigger: "blur" }]
 })
 
 // const imageUploadUrl = ref<string>(`http://127.0.0.1:8000/api/v1/auth/upload?token=${user.token}`)
@@ -60,18 +73,23 @@ const uploadImage = (
 
     await uploadDataApi({ file: file, type: t })
       .then((res) => {
-        console.log("res", res)
+        // console.log("res", res)
         state.value[fieldName] = res.data.url
         state.value[preViewFieldName] = res.data.abs_url
         if (t === "front") {
           state.value.legal_person = res.data.name || ""
+          // setLicencePath(res.data.name)
           state.value.legal_identity = res.data.cardId || ""
+          formRef.value?.validateField("legal_identity_front")
+        } else if (t === "licence_path") {
+          formRef.value?.validateField("licence_path")
+        } else if (t === "back") {
+          formRef.value?.validateField("legal_identity_back")
         }
-        console.log(state.value)
         ElMessage.success("成功")
       })
       .catch((res) => {
-        console.log(res)
+        console.log("k", res)
         ElMessage.error(res.message)
       })
   }
@@ -90,8 +108,16 @@ const InitRequest = async () => {
       ElMessage.error(res)
     })
 }
-const doSubmit = () => {}
-InitRequest()
+const doSubmit = () => {
+  formRef.value?.validate((valid: boolean) => {
+    if (valid) {
+      console.log("hahah")
+    }
+  })
+}
+if (user.AuthId != "0") {
+  InitRequest()
+}
 // console.log("file", file)
 // console.log("res", res)
 // console.log(res)
@@ -121,26 +147,26 @@ InitRequest()
         </router-link>
       </div>
     </template>
-    <el-form :model="state" ref="formRef" label-width="140px">
+    <el-form :model="state" ref="formRef" :rules="rules" label-width="140px">
       <div style="padding: 0 20px">
         <div>
           <h4>企业信息</h4>
 
           <el-row :gutter="30">
             <el-col :span="12">
-              <el-form-item style="margin-top: 24px" :error="error.title" label="企业名称">
+              <el-form-item style="margin-top: 24px" :error="error.title" prop="title" label="企业名称">
                 <el-input v-model="state.title" placeholder="企业名称" />
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item style="margin-top: 24px" :error="error.unique_id" label="统一社会信用代码">
+              <el-form-item style="margin-top: 24px" :error="error.unique_id" prop="unique_id" label="统一社会信用代码">
                 <el-input v-model.trim="state.unique_id" autocomplete="off" placeholder="统一社会信用代码" />
               </el-form-item>
             </el-col>
           </el-row>
           <el-row :gutter="30">
             <el-col :span="12">
-              <el-form-item style="margin-top: 24px" :error="error.licence_path" label="营业执照">
+              <el-form-item style="margin-top: 24px" prop="licence_path" :error="error.licence_path" label="营业执照">
                 <ul
                   v-if="state.licence_path"
                   class="el-upload-list el-upload-list--picture-card"
@@ -192,12 +218,17 @@ InitRequest()
 
           <el-row :gutter="30">
             <el-col :span="12">
-              <el-form-item style="margin-top: 24px" :error="error.legal_person" label="法人姓名">
+              <el-form-item style="margin-top: 24px" prop="legal_person" :error="error.legal_person" label="法人姓名">
                 <el-input v-model="state.legal_person" placeholder="法人姓名" />
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item style="margin-top: 24px" :error="error.legal_identity" label="法人身份证">
+              <el-form-item
+                style="margin-top: 24px"
+                prop="legal_identity"
+                :error="error.legal_identity"
+                label="法人身份证"
+              >
                 <el-input v-model="state.legal_identity" placeholder="法人身份证" />
               </el-form-item>
             </el-col>
@@ -205,7 +236,12 @@ InitRequest()
           <!-- :on-success="uploadSuccessWrapper('legal_identity_front', 'legal_identity_front_url')" -->
           <el-row :gutter="30">
             <el-col :span="12">
-              <el-form-item style="margin-top: 24px" :error="error.legal_identity_front" label="法人身份证人头面">
+              <el-form-item
+                style="margin-top: 24px"
+                prop="legal_identity_front"
+                :error="error.legal_identity_front"
+                label="法人身份证人头面"
+              >
                 <el-upload
                   class="avatar-uploader"
                   :action="imageUploadUrl"
@@ -222,7 +258,12 @@ InitRequest()
             </el-col>
             <!-- :on-success="uploadSuccessWrapper('legal_identity_back', 'legal_identity_back_url')" -->
             <el-col :span="12">
-              <el-form-item style="margin-top: 24px" :error="error.legal_identity_back" label="法人身份证国徽面">
+              <el-form-item
+                style="margin-top: 24px"
+                prop="legal_identity_back"
+                :error="error.legal_identity_back"
+                label="法人身份证国徽面"
+              >
                 <el-upload
                   class="avatar-uploader"
                   :action="imageUploadUrl"

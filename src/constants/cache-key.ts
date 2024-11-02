@@ -10,6 +10,9 @@ class CacheKey {
   static readonly CACHED_VIEWS = `${SYSTEM_NAME}-cached-views-key`
   static readonly UID = "UID"
   static readonly AUTH_ID = "AUTH_ID"
+  static readonly LICENCE_PATH_URL = "LICENCE_PATH_URL"
+  static readonly FRONT_URL = "FRONT_URL"
+  static readonly BACK_URL = "BACK_URL"
 }
 
 export default CacheKey
