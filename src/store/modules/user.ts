@@ -18,11 +18,16 @@ import {
   getLicencePath,
   removeBackUrl,
   removeFrontUrl,
-  removeLicencePath
+  removeLicencePath,
+  setLicencePath,
+  setFrontUrl,
+  setBackUrl
 } from "@/utils/cache/cookies"
 import { resetRouter } from "@/router"
 import { loginApi, getUserInfoApi, mobileLoginApi, SendSmsApi } from "@/api/login"
 import { type LoginRequestData, type MobileLoginRequestData, type SendSmsRequestData } from "@/api/login/types/login"
+import { SubmitApi } from "@/api/auth"
+import { type CompanyError } from "@/api/auth/type/auth"
 import { registerApi } from "@/api/register"
 import { type RegisterRequestData } from "@/api/register/types/register"
 import routeSettings from "@/config/route"
@@ -44,7 +49,33 @@ export const useUserStore = defineStore("user", () => {
 
   const tagsViewStore = useTagsViewStore()
   const settingsStore = useSettingsStore()
-
+  // 认证提交
+  const doSubmit = async ({
+    title,
+    unique_id,
+    licence_path,
+    legal_person,
+    legal_identity,
+    legal_identity_front,
+    legal_identity_back
+  }: CompanyError) => {
+    const { data } = await SubmitApi({
+      title,
+      unique_id,
+      licence_path,
+      legal_person,
+      legal_identity,
+      legal_identity_front,
+      legal_identity_back
+    })
+    setLicencePath(data.licence_path_url || "")
+    setFrontUrl(data.legal_identity_front_url || "")
+    setBackUrl(data.legal_identity_back_url || "")
+    LicencePathUrl.value = data.licence_path_url || ""
+    FrontUrl.value = data.legal_identity_back_url || ""
+    BackUrl.value = data.legal_identity_back_url || ""
+    console.log("pinia", data)
+  }
   /** 登录 */
   const login = async ({ username, password }: LoginRequestData) => {
     const { data } = await loginApi({ username, password })
@@ -155,7 +186,8 @@ export const useUserStore = defineStore("user", () => {
     resetToken,
     LicencePathUrl,
     FrontUrl,
-    BackUrl
+    BackUrl,
+    doSubmit
   }
 })
 

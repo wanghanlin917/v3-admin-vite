@@ -6,7 +6,7 @@ import { uploadDataApi } from "@/api/common/index"
 import { ElMessage } from "element-plus"
 import { InitDateApi } from "@/api/auth"
 import { type FormInstance, type FormRules } from "element-plus"
-import { getLicencePath, setLicencePath, getFrontUrl, setFrontUrl, getBackUrl, setBackUrl } from "@/utils/cache/cookies"
+import { getLicencePath, getFrontUrl, getBackUrl } from "@/utils/cache/cookies"
 const user = useUserStore()
 const dialogLicenceVisible = ref<boolean>(false)
 const formRef = ref<FormInstance>()
@@ -111,7 +111,15 @@ const InitRequest = async () => {
 const doSubmit = () => {
   formRef.value?.validate((valid: boolean) => {
     if (valid) {
+      delete state.value.legal_identity_back_url
+      delete state.value.licence_path_url
+      delete state.value.legal_identity_front_url
       console.log("hahah")
+      console.log("编辑页面", state)
+      user.doSubmit(state.value)
+      state.value.legal_identity_back_url = user.BackUrl
+      state.value.legal_identity_front_url = user.FrontUrl
+      state.value.licence_path_url = user.LicencePathUrl
     }
   })
 }
