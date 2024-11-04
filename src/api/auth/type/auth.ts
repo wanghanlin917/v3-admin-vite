@@ -40,6 +40,8 @@ export interface UploadResponse {
 }
 
 export type CompanyResponseData = ApiResponseData<{
+  id?: string
+  auth_type?: number
   title: string
   unique_id: string
   licence_path: string

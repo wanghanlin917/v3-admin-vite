@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue"
+import { ref, onMounted } from "vue"
 import { useUserStore } from "@/store/modules/user"
 import { CompanyEditRequestData, CompanyError } from "@/api/auth/type/auth"
 import { uploadDataApi } from "@/api/common/index"
@@ -98,14 +98,16 @@ const uploadImage = (
 const InitRequest = async () => {
   console.log("hahahaahah")
 
-  await InitDateApi({ auth_id: user.AuthId })
+  await InitDateApi({ authId: user.AuthId })
     .then((res) => {
+      console.log("init", res)
+      state.value = { ...res.data }
       console.log("hahahah")
       console.log("tt", res)
     })
     .catch((res) => {
       console.log(res.message)
-      ElMessage.error(res)
+      ElMessage.error("hahahahahahahahah")
     })
 }
 const doSubmit = () => {
@@ -116,16 +118,22 @@ const doSubmit = () => {
       delete state.value.legal_identity_front_url
       console.log("hahah")
       console.log("编辑页面", state)
-      user.doSubmit(state.value)
-      state.value.legal_identity_back_url = user.BackUrl
-      state.value.legal_identity_front_url = user.FrontUrl
-      state.value.licence_path_url = user.LicencePathUrl
+      user.doSubmit(state.value).then(() => {
+        state.value.legal_identity_back_url = user.BackUrl
+        state.value.legal_identity_front_url = user.FrontUrl
+        state.value.licence_path_url = user.LicencePathUrl
+        InitRequest()
+      })
     }
   })
 }
-if (user.AuthId != "0") {
-  InitRequest()
-}
+onMounted(() => {
+  console.log("onMOunt", user.AuthId)
+  if (user.AuthId != "0") {
+    InitRequest()
+  }
+})
+
 // console.log("file", file)
 // console.log("res", res)
 // console.log(res)

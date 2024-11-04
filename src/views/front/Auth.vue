@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { ref } from "vue"
+import { ref, onMounted } from "vue"
 import { useUserStore } from "@/store/modules/user"
 import { CompanyRequestData } from "@/api/auth/type/auth"
+import { InitDateApi } from "@/api/auth"
+import { ElMessage } from "element-plus"
 const user = useUserStore()
 const authList = ref<string[]>(["未认证", "认证中", "已认证", "认证失败"])
 const state = ref<CompanyRequestData>({
@@ -10,9 +12,32 @@ const state = ref<CompanyRequestData>({
   licence_path_url: "",
   legal_person: "",
   legal_identity: "",
-  legal_identity_front_url: "http://127.0.0.1:8000/media/upload/20241030/id.png",
+  legal_identity_front_url: "",
   legal_identity_back_url: "",
   remark: ""
+})
+const InitRequest = async () => {
+  console.log("hahahaahah")
+
+  await InitDateApi({ authId: user.AuthId })
+    .then((res) => {
+      console.log("init", res)
+      state.value = { ...res.data }
+      console.log("hahahah")
+      console.log("tt", res)
+    })
+    .catch((res) => {
+      console.log(res.message)
+      ElMessage.error("hahahahahahahahah")
+    })
+}
+onMounted(() => {
+  console.log("onMOunt", user.AuthId)
+  console.log("onMOunt", user.type)
+  console.log("onMOunt", typeof user.type)
+  if (user.AuthId != "0") {
+    InitRequest()
+  }
 })
 </script>
 <template>
@@ -23,7 +48,7 @@ const state = ref<CompanyRequestData>({
           <span style="font-weight: bold; font-size: 18px">账号认证</span>
           <el-tag
             size="small"
-            :type="user.type === 1 ? 'info' : user.type === 2 ? 'warning' : user.type === 3 ? 'success' : 'danger'"
+            :type="user.type == 1 ? 'info' : user.type == 2 ? 'warning' : user.type == 3 ? 'success' : 'danger'"
             style="margin-left: 20px"
             >{{ authList[user.type - 1] }}</el-tag
           >
@@ -62,7 +87,7 @@ const state = ref<CompanyRequestData>({
               fit="cover"
             />
           </el-col>
-          <el-col :span="8" class="row-right" v-else> 无 </el-col>
+          <el-col :span="8" class="row-right" v-else />
         </el-row>
       </div>
       <el-divider border-style="dotted" />
@@ -74,7 +99,7 @@ const state = ref<CompanyRequestData>({
         </el-row>
         <el-row :gutter="10" class="info-row">
           <el-col :span="4" style="text-align: right" class="row-left">法人身份证</el-col>
-          <el-col :span="15" style="text-align: left" class="row-right">无</el-col>
+          <el-col :span="15" style="text-align: left" class="row-right">{{ state.legal_identity || "无" }}</el-col>
         </el-row>
         <el-row :gutter="10" class="info-row">
           <el-col :span="4" class="row-left">法人身份证头像面</el-col>
@@ -86,7 +111,7 @@ const state = ref<CompanyRequestData>({
               fit="cover"
             />
           </el-col>
-          <el-col :span="8" class="row-right" v-else> 无 </el-col>
+          <el-col :span="8" class="row-right" v-else />
         </el-row>
 
         <el-row :gutter="10" class="info-row">
@@ -99,7 +124,7 @@ const state = ref<CompanyRequestData>({
               fit="cover"
             />
           </el-col>
-          <el-col :span="8" class="row-right" v-else> 无 </el-col>
+          <el-col :span="8" class="row-right" v-else />
         </el-row>
       </div>
       <el-divider border-style="dotted" />

@@ -68,12 +68,16 @@ export const useUserStore = defineStore("user", () => {
       legal_identity_front,
       legal_identity_back
     })
+    AuthId.value = data.id || ""
+    setAuthId(data.id || "")
+    console.log("doSubmit", data)
     setLicencePath(data.licence_path_url || "")
     setFrontUrl(data.legal_identity_front_url || "")
     setBackUrl(data.legal_identity_back_url || "")
     LicencePathUrl.value = data.licence_path_url || ""
     FrontUrl.value = data.legal_identity_back_url || ""
     BackUrl.value = data.legal_identity_back_url || ""
+    type.value = data.auth_type || 0
     console.log("pinia", data)
   }
   /** 登录 */

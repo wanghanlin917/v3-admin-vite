@@ -104,7 +104,7 @@ const logout = () => {
         <p><strong>注册时间:</strong> {{ user.ctime }}</p>
         <el-tag
           size="small"
-          :type="user.type === 1 ? 'info' : user.type === 2 ? 'warning' : user.type === 3 ? 'success' : 'danger'"
+          :type="user.type == 1 ? 'info' : user.type == 2 ? 'warning' : user.type == 3 ? 'success' : 'danger'"
           style="margin-right: 20px"
           >{{ authList[user.type - 1] }}</el-tag
         >

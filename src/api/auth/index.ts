@@ -4,9 +4,9 @@ import type * as auth from "./type/auth"
 
 // const user = useUserStore()
 
-export function InitDateApi(data: { auth_id: string }) {
+export function InitDateApi(data: { authId: string }) {
   return request<any>({
-    url: `auth/${data.auth_id}`,
+    url: `auth/${data.authId}`,
     method: "get"
   })
 }
