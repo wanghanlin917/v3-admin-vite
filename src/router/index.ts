@@ -96,6 +96,14 @@ export const constantRoutes: RouteRecordRaw[] = [
         }
       },
       {
+        path: "wallet",
+        component: () => import("@/views/front/Wallet.vue"),
+        name: "Wallet",
+        meta: {
+          title: "我的钱包"
+        }
+      },
+      {
         path: "/auth_edit",
         component: () => import("@/views/front/AuthEdit.vue"),
         name: "AuthEdit"
