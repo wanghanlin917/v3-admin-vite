@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref } from "vue"
+import { ref, onMounted } from "vue"
 import { WalletRequestData } from "@/api/wallet/type/wallet"
+import { initWalletApi } from "@/api/wallet/index"
 const state = ref<WalletRequestData>({
   money: {
     total: 0,
@@ -21,6 +22,15 @@ const state = ref<WalletRequestData>({
     amount: "",
     ali_acount: ""
   }
+})
+const InitWallet = async () => {
+  await initWalletApi().then((res) => {
+    state.value.money = { ...res.data }
+    // console.log("钱包初始化", res)
+  })
+}
+onMounted(() => {
+  InitWallet()
 })
 </script>
 <template>
