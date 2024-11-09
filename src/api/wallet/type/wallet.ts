@@ -12,10 +12,10 @@ export interface WalletRequestData {
   }
   withdrawForm: {
     amount: string
-    ali_acount: string
+    ali_account: string
   }
   withdrawFormError: {
     amount: string
-    ali_acount: string
+    ali_account: string
   }
 }
