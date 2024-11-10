@@ -19,3 +19,7 @@ export interface WalletRequestData {
     ali_account: string
   }
 }
+
+export interface ChargeWalletRequestData {
+  amount: string
+}

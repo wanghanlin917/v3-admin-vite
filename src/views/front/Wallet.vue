@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
 import { WalletRequestData } from "@/api/wallet/type/wallet"
-import { initWalletApi } from "@/api/wallet/index"
+import { initWalletApi, chargeWalletApi } from "@/api/wallet/index"
 import { Money, Postcard } from "@element-plus/icons-vue"
 const state = ref<WalletRequestData>({
   money: {
@@ -30,7 +30,12 @@ const InitWallet = async () => {
     // console.log("钱包初始化", res)
   })
 }
-const doCharge = () => {}
+const doCharge = async () => {
+  await chargeWalletApi(state.value.chargeForm).then((res) => {
+    window.open(res.data)
+    console.log(res)
+  })
+}
 onMounted(() => {
   InitWallet()
 })
