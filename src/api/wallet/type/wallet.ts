@@ -1,4 +1,5 @@
 export interface WalletRequestData {
+  moneyLoading: boolean
   money: {
     total: number
     freeze_balance: number
@@ -22,4 +23,9 @@ export interface WalletRequestData {
 
 export interface ChargeWalletRequestData {
   amount: string
+}
+
+export interface WithDrawRequestData {
+  amount: string
+  ali_account: string
 }

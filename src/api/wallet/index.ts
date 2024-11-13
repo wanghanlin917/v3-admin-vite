@@ -15,3 +15,11 @@ export function chargeWalletApi(data: wallet.ChargeWalletRequestData) {
     data
   })
 }
+
+export function withdrawAPI(data: wallet.WithDrawRequestData) {
+  return request<any>({
+    url: "wallet/withdraw",
+    method: "post",
+    data
+  })
+}

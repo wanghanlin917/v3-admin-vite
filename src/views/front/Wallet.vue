@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
 import { WalletRequestData } from "@/api/wallet/type/wallet"
-import { initWalletApi, chargeWalletApi } from "@/api/wallet/index"
+import { initWalletApi, chargeWalletApi, withdrawAPI } from "@/api/wallet/index"
 import { Money, Postcard } from "@element-plus/icons-vue"
+import { ElMessageBox, ElLoading, ElMessage, ElNotification } from "element-plus"
+import { useRoute, useRouter } from "vue-router"
+const route = useRoute()
+const router = useRouter()
 const state = ref<WalletRequestData>({
+  moneyLoading: false,
   money: {
     total: 0,
     freeze_balance: 0,
@@ -17,7 +22,7 @@ const state = ref<WalletRequestData>({
   },
   withdrawForm: {
     amount: "",
-    ali_account: ""
+    ali_account: "gwbiqc0184@sandbox.com"
   },
   withdrawFormError: {
     amount: "",
@@ -25,19 +30,73 @@ const state = ref<WalletRequestData>({
   }
 })
 const InitWallet = async () => {
+  state.value.moneyLoading = true
   await initWalletApi().then((res) => {
+    state.value.moneyLoading = false
     state.value.money = { ...res.data }
     // console.log("钱包初始化", res)
   })
 }
-const doCharge = async () => {
-  await chargeWalletApi(state.value.chargeForm).then((res) => {
-    window.open(res.data)
-    console.log(res)
+const initPayMessage = () => {
+  const pay = route.query.pay
+  if (pay === "success") {
+    ElMessage.success("支付成功")
+  } else if (pay === "error") {
+    ElMessage.error("支付失败")
+  }
+  router.replace({ name: route.name })
+}
+const doCharge = () => {
+  ElMessageBox.confirm("确定要跳转到支付宝支付吗？", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "warning"
+  }).then(async () => {
+    const loadingInstance1 = ElLoading.service({ fullscreen: true })
+    await chargeWalletApi(state.value.chargeForm).then((res) => {
+      loadingInstance1.close()
+      window.open(res.data, "_self")
+      state.value.chargeForm.amount = ""
+      ElMessageBox.confirm("是否充值成功？", {
+        confirmButtonText: "充值成功",
+        cancelButtonText: "充值失败",
+        type: "warning"
+      })
+        .then(() => {
+          location.reload()
+        })
+        .catch(() => {
+          location.reload()
+        })
+      // console.log("支付", res)
+      // console.log(res)
+    })
+  })
+}
+const doWithdraw = () => {
+  ElMessageBox.confirm("确定提现到支付宝吗？", {
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    type: "warning"
+  }).then(async () => {
+    await withdrawAPI(state.value.withdrawForm).then((res) => {
+      // console.log(res)
+      if (res.code === 0) {
+        ElNotification({
+          title: "提现申请",
+          message: "提现成功 or 等待管理员审核中",
+          type: "success"
+        })
+      }
+      // else if (res.code === -1) {
+      //   validateFormError(state.withdrawFormError, res.data.detail)
+      // }
+    })
   })
 }
 onMounted(() => {
   InitWallet()
+  initPayMessage()
 })
 </script>
 <template>
@@ -111,7 +170,6 @@ onMounted(() => {
                 <el-form-item label="金额" prop="amount" :error="state.chargeFormError.amount">
                   <el-input v-model="state.chargeForm.amount" placeholder="金额" :prefix-icon="Money" />
                 </el-form-item>
-
                 <el-form-item>
                   <el-button type="primary" @click="doCharge">充值</el-button>
                 </el-form-item>
