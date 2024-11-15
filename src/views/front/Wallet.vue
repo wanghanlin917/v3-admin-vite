@@ -27,7 +27,26 @@ const state = ref<WalletRequestData>({
   withdrawFormError: {
     amount: "",
     ali_account: ""
-  }
+  },
+  searchForm: {
+    date_range: "",
+    tran_type: "",
+    trans_id: ""
+  },
+  options: [
+    {
+      value: "",
+      label: "全部"
+    },
+    {
+      value: "",
+      label: "充值"
+    },
+    {
+      value: "",
+      label: "提现"
+    }
+  ]
 })
 const InitWallet = async () => {
   state.value.moneyLoading = true
@@ -79,7 +98,9 @@ const doWithdraw = () => {
     cancelButtonText: "取消",
     type: "warning"
   }).then(async () => {
+    const loadingInstance1 = ElLoading.service({ fullscreen: true })
     await withdrawAPI(state.value.withdrawForm).then((res) => {
+      loadingInstance1.close()
       // console.log(res)
       if (res.code === 0) {
         ElNotification({
@@ -225,6 +246,43 @@ onMounted(() => {
                 >我要提现
               </el-button>
             </div>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col>
+        <el-card class="box-card" shadow="never" style="margin-top: 20px; margin-bottom: 100px">
+          <template #header>
+            <div class="card-header">
+              <span style="font-weight: bold; font-size: 18px">交易记录</span>
+            </div>
+          </template>
+          <div style="margin-top: 20px">
+            <el-form :inline="true" :model="state.searchForm" ref="searchForm">
+              <el-form-item label="交易时间" prop="date_range">
+                <el-date-picker
+                  v-model="state.searchForm.date_range"
+                  type="daterange"
+                  start-placeholder="起始"
+                  end-placeholder="结束"
+                  format="YYYY-MM-DD"
+                  value-format="YYYY-MM-DD"
+                  style="width: 200px"
+                />
+              </el-form-item>
+              <el-form-item label="交易类型" prop="tran_type">
+                <el-select v-model="state.searchForm.tran_type" placeholder="交易类型" style="width: 200px">
+                  <el-option v-for="item in state.options" :key="item.value" :label="item.label" :value="item.value" />
+                </el-select>
+              </el-form-item>
+              <el-form-item label="订单号" prop="trans_id">
+                <el-input style="width: 200px" placeholder="订单号" v-model="state.searchForm.trans_id" />
+              </el-form-item>
+
+              <el-form-item>
+                <el-button type="primary" @click="doSearch">搜 索</el-button>
+                <el-button type="primary" plain @click="doSearchReset">重 置</el-button>
+              </el-form-item>
+            </el-form>
           </div>
         </el-card>
       </el-col>

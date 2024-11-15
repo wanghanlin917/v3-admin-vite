@@ -19,6 +19,25 @@ export interface WalletRequestData {
     amount: string
     ali_account: string
   }
+  searchForm: {
+    date_range: string
+    tran_type: string
+    trans_id: string
+  }
+  options: [
+    {
+      value: string
+      label: string
+    },
+    {
+      value: string
+      label: string
+    },
+    {
+      value: string
+      label: string
+    }
+  ]
 }
 
 export interface ChargeWalletRequestData {
