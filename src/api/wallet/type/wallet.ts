@@ -26,15 +26,15 @@ export interface WalletRequestData {
   }
   options: [
     {
-      value: string
+      value: number
       label: string
     },
     {
-      value: string
+      value: number
       label: string
     },
     {
-      value: string
+      value: number
       label: string
     }
   ]

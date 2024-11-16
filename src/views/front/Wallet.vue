@@ -35,15 +35,15 @@ const state = ref<WalletRequestData>({
   },
   options: [
     {
-      value: "",
+      value: 0,
       label: "全部"
     },
     {
-      value: "",
+      value: 1,
       label: "充值"
     },
     {
-      value: "",
+      value: -1,
       label: "提现"
     }
   ]
@@ -282,6 +282,13 @@ onMounted(() => {
                 <el-button type="primary" @click="doSearch">搜 索</el-button>
                 <el-button type="primary" plain @click="doSearchReset">重 置</el-button>
               </el-form-item>
+              <el-divider border-style="dashed" />
+              <el-table :data="tableData" stripe style="width: 100%">
+                <el-table-column prop="create_datetime" label="时间" width="180" />
+                <el-table-column prop="trans_id" label="订单号" width="180" />
+                <el-table-column prop="tran_type_txt" label="交易类型" />
+                <el-table-column label="状态"></el-table-column>
+              </el-table>
             </el-form>
           </div>
         </el-card>
