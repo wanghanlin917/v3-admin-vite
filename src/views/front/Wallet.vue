@@ -48,6 +48,8 @@ const state = ref<WalletRequestData>({
     }
   ]
 })
+const tableData = ref<any>([{ create_datetime: "111", trans_id: "xxx", tran_type_txt: "xxxxxx" }])
+const payStstusList = ref<string[]>(["已取消", "未支付", "已支付"])
 const InitWallet = async () => {
   state.value.moneyLoading = true
   await initWalletApi().then((res) => {
@@ -285,9 +287,32 @@ onMounted(() => {
               <el-divider border-style="dashed" />
               <el-table :data="tableData" stripe style="width: 100%">
                 <el-table-column prop="create_datetime" label="时间" width="180" />
-                <el-table-column prop="trans_id" label="订单号" width="180" />
+                <el-table-column prop="trans_id" label="订单号" width="300" />
                 <el-table-column prop="tran_type_txt" label="交易类型" />
-                <el-table-column label="状态"></el-table-column>
+                <el-table-column label="状态">
+                  <template #default="scope">
+                    <el-tag
+                      size="small"
+                      :type="
+                        scope.row.pay_status == -1
+                          ? 'info'
+                          : scope.row.pay_status == 0
+                            ? 'warning'
+                            : scope.row.pay_status == 1
+                              ? 'success'
+                              : 'danger'
+                      "
+                    >
+                      {{ payStstusList[scope.row.pay_status + 1] }}
+                    </el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column label="其他">
+                  <template #default="scope">
+                    <el-button type="danger" size="small">取消</el-button>
+                    <el-button type="success" size="small">重新支付</el-button>
+                  </template>
+                </el-table-column>
               </el-table>
             </el-form>
           </div>
