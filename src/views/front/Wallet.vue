@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
 import { WalletRequestData } from "@/api/wallet/type/wallet"
-import { initWalletApi, chargeWalletApi, withdrawAPI } from "@/api/wallet/index"
+import { initWalletApi, chargeWalletApi, withdrawAPI, tableDateApi } from "@/api/wallet/index"
 import { Money, Postcard } from "@element-plus/icons-vue"
 import { ElMessageBox, ElLoading, ElMessage, ElNotification } from "element-plus"
 import { useRoute, useRouter } from "vue-router"
@@ -28,11 +28,11 @@ const state = ref<WalletRequestData>({
     amount: "",
     ali_account: ""
   },
-  searchForm: {
-    date_range: "",
-    tran_type: "",
-    trans_id: ""
-  },
+  // searchForm: {
+  //   date_range: "",
+  //   tran_type: "",
+  //   trans_id: ""
+  // },
   options: [
     {
       value: 0,
@@ -48,14 +48,38 @@ const state = ref<WalletRequestData>({
     }
   ]
 })
+const params = ref<any>({
+  page: 1,
+  pageSize: 2,
+  date_range: "",
+  tran_type: "",
+  trans_id: ""
+})
+
+const total = ref<number>(0)
 const tableData = ref<any>([{ create_datetime: "111", trans_id: "xxx", tran_type_txt: "xxxxxx" }])
 const payStstusList = ref<string[]>(["已取消", "未支付", "已支付"])
+const tranTypeList = ref<string[]>(["提现", "", "充值"])
+
+const handleSizeChange = (val: number) => {
+  console.log(`${val} items per page`)
+}
+const handleCurrentChange = (val: number) => {
+  console.log(`current page: ${val}`)
+}
 const InitWallet = async () => {
   state.value.moneyLoading = true
   await initWalletApi().then((res) => {
     state.value.moneyLoading = false
     state.value.money = { ...res.data }
     // console.log("钱包初始化", res)
+  })
+}
+const initTableDateApi = async () => {
+  await tableDateApi(params).then((res) => {
+    console.log(res)
+    tableData.value = res.data.data
+    total.value = res.data.total
   })
 }
 const initPayMessage = () => {
@@ -120,6 +144,7 @@ const doWithdraw = () => {
 onMounted(() => {
   InitWallet()
   initPayMessage()
+  initTableDateApi()
 })
 </script>
 <template>
@@ -262,7 +287,7 @@ onMounted(() => {
             <el-form :inline="true" :model="state.searchForm" ref="searchForm">
               <el-form-item label="交易时间" prop="date_range">
                 <el-date-picker
-                  v-model="state.searchForm.date_range"
+                  v-model="params.date_range"
                   type="daterange"
                   start-placeholder="起始"
                   end-placeholder="结束"
@@ -272,12 +297,12 @@ onMounted(() => {
                 />
               </el-form-item>
               <el-form-item label="交易类型" prop="tran_type">
-                <el-select v-model="state.searchForm.tran_type" placeholder="交易类型" style="width: 200px">
+                <el-select v-model="params.tran_type" placeholder="交易类型" style="width: 200px">
                   <el-option v-for="item in state.options" :key="item.value" :label="item.label" :value="item.value" />
                 </el-select>
               </el-form-item>
               <el-form-item label="订单号" prop="trans_id">
-                <el-input style="width: 200px" placeholder="订单号" v-model="state.searchForm.trans_id" />
+                <el-input style="width: 200px" placeholder="订单号" v-model="params.trans_id" />
               </el-form-item>
 
               <el-form-item>
@@ -288,7 +313,11 @@ onMounted(() => {
               <el-table :data="tableData" stripe style="width: 100%">
                 <el-table-column prop="create_datetime" label="时间" width="180" />
                 <el-table-column prop="trans_id" label="订单号" width="300" />
-                <el-table-column prop="tran_type_txt" label="交易类型" />
+                <el-table-column prop="tran_type" label="交易类型">
+                  <template #default="scope">
+                    {{ tranTypeList[scope.row.tran_type + 1] }}
+                  </template>
+                </el-table-column>
                 <el-table-column label="状态">
                   <template #default="scope">
                     <el-tag
@@ -308,13 +337,22 @@ onMounted(() => {
                   </template>
                 </el-table-column>
                 <el-table-column label="其他">
-                  <template #default="scope">
-                    <el-button type="danger" size="small">取消</el-button>
-                    <el-button type="success" size="small">重新支付</el-button>
-                  </template>
+                  <el-button type="danger" size="small">取消</el-button>
+                  <el-button type="success" size="small">重新支付</el-button>
                 </el-table-column>
               </el-table>
             </el-form>
+          </div>
+          <div class="page-container">
+            <el-pagination
+              :current-page="params.page"
+              :page-size="10"
+              :disabled="false"
+              layout="total,prev,pager,next"
+              :total="total"
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+            />
           </div>
         </el-card>
       </el-col>
@@ -355,5 +393,10 @@ onMounted(() => {
 .ivu-form-item {
   margin-bottom: 14px;
   margin-right: 50px;
+}
+.page-container {
+  overflow: hidden;
+  float: right;
+  margin: 50px 200px 30px;
 }
 </style>

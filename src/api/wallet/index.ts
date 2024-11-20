@@ -23,3 +23,11 @@ export function withdrawAPI(data: wallet.WithDrawRequestData) {
     data
   })
 }
+
+export function tableDateApi(params: any) {
+  return request<any>({
+    url: "wallet/tran",
+    method: "get",
+    params
+  })
+}
