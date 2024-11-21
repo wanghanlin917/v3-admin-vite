@@ -24,7 +24,15 @@ export function withdrawAPI(data: wallet.WithDrawRequestData) {
   })
 }
 
-export function tableDateApi(params: any) {
+export function tableDateApi(params: {
+  page: number
+  pageSize: number
+  date_info: string[]
+  tran_type: number
+  trans_id: string
+  date_range?: string
+  date_range_end?: string
+}) {
   return request<any>({
     url: "wallet/tran",
     method: "get",

@@ -48,24 +48,74 @@ const state = ref<WalletRequestData>({
     }
   ]
 })
-const params = ref<any>({
+const params = ref<{
+  page: number
+  pageSize: number
+  date_info: string[]
+  tran_type: number
+  trans_id: string
+}>({
   page: 1,
-  pageSize: 2,
-  date_range: "",
-  tran_type: "",
+  pageSize: 5,
+  date_info: [],
+  tran_type: 0,
   trans_id: ""
 })
+// const date_range = ref<string>()
+// const date_range_end = ref<string>()
 
 const total = ref<number>(0)
-const tableData = ref<any>([{ create_datetime: "111", trans_id: "xxx", tran_type_txt: "xxxxxx" }])
+const tableData = ref<any>()
 const payStstusList = ref<string[]>(["已取消", "未支付", "已支付"])
 const tranTypeList = ref<string[]>(["提现", "", "充值"])
+const searchDate = ref<any>()
 
-const handleSizeChange = (val: number) => {
-  console.log(`${val} items per page`)
+const doSearchReset = () => {
+  params.value = {
+    page: 1,
+    pageSize: 5,
+    date_info: [],
+    tran_type: 0,
+    trans_id: ""
+  }
 }
-const handleCurrentChange = (val: number) => {
-  console.log(`current page: ${val}`)
+const doSearch = async () => {
+  params.value.page = 1
+  // console.log(params.value)
+  // date_range.value = params.value.date_info[0]
+  // date_range_end.value = params.value.date_info[1]
+  if (params.value.date_info) {
+    searchDate.value = {
+      ...params.value,
+      date_range: params.value.date_info[0],
+      date_range_end: params.value.date_info[1]
+    }
+  } else {
+    searchDate.value = { ...params.value }
+  }
+  delete searchDate.value.date_info
+
+  await tableDateApi(searchDate.value).then((res) => {
+    // console.log("search", res)
+    tableData.value = res.data.data
+    total.value = res.data.total
+  })
+}
+const indexMethod = (val: number) => {
+  // console.log(val)
+  return (params.value.page - 1) * params.value.pageSize + val + 1
+}
+const handleCurrentChange = async (val: number) => {
+  // console.log(`current page: ${val}`)
+  // console.log("page", val)
+  params.value.page = val
+  // console.log("params", params)
+  initTableDateApi()
+  // await tableDateApi(params.value).then((res) => {
+  //   console.log(res)
+  //   tableData.value = res.data.data
+  //   total.value = res.data.total
+  // })
 }
 const InitWallet = async () => {
   state.value.moneyLoading = true
@@ -76,8 +126,8 @@ const InitWallet = async () => {
   })
 }
 const initTableDateApi = async () => {
-  await tableDateApi(params).then((res) => {
-    console.log(res)
+  await tableDateApi(params.value).then((res) => {
+    console.log("inittable", res)
     tableData.value = res.data.data
     total.value = res.data.total
   })
@@ -284,10 +334,10 @@ onMounted(() => {
             </div>
           </template>
           <div style="margin-top: 20px">
-            <el-form :inline="true" :model="state.searchForm" ref="searchForm">
+            <el-form :inline="true" :model="params" ref="searchForm">
               <el-form-item label="交易时间" prop="date_range">
                 <el-date-picker
-                  v-model="params.date_range"
+                  v-model="params.date_info"
                   type="daterange"
                   start-placeholder="起始"
                   end-placeholder="结束"
@@ -309,48 +359,48 @@ onMounted(() => {
                 <el-button type="primary" @click="doSearch">搜 索</el-button>
                 <el-button type="primary" plain @click="doSearchReset">重 置</el-button>
               </el-form-item>
-              <el-divider border-style="dashed" />
-              <el-table :data="tableData" stripe style="width: 100%">
-                <el-table-column prop="create_datetime" label="时间" width="180" />
-                <el-table-column prop="trans_id" label="订单号" width="300" />
-                <el-table-column prop="tran_type" label="交易类型">
-                  <template #default="scope">
-                    {{ tranTypeList[scope.row.tran_type + 1] }}
-                  </template>
-                </el-table-column>
-                <el-table-column label="状态">
-                  <template #default="scope">
-                    <el-tag
-                      size="small"
-                      :type="
-                        scope.row.pay_status == -1
-                          ? 'info'
-                          : scope.row.pay_status == 0
-                            ? 'warning'
-                            : scope.row.pay_status == 1
-                              ? 'success'
-                              : 'danger'
-                      "
-                    >
-                      {{ payStstusList[scope.row.pay_status + 1] }}
-                    </el-tag>
-                  </template>
-                </el-table-column>
-                <el-table-column label="其他">
-                  <el-button type="danger" size="small">取消</el-button>
-                  <el-button type="success" size="small">重新支付</el-button>
-                </el-table-column>
-              </el-table>
             </el-form>
+            <el-divider border-style="dashed" />
+            <el-table :data="tableData" stripe style="width: 100%">
+              <el-table-column type="index" :index="indexMethod" width="50" />
+              <el-table-column prop="create_datetime" label="时间" width="180" />
+              <el-table-column prop="trans_id" label="订单号" width="300" />
+              <el-table-column prop="tran_type" label="交易类型">
+                <template #default="scope">
+                  {{ tranTypeList[scope.row.tran_type + 1] }}
+                </template>
+              </el-table-column>
+              <el-table-column label="状态">
+                <template #default="scope">
+                  <el-tag
+                    size="small"
+                    :type="
+                      scope.row.pay_status == -1
+                        ? 'info'
+                        : scope.row.pay_status == 0
+                          ? 'warning'
+                          : scope.row.pay_status == 1
+                            ? 'success'
+                            : 'danger'
+                    "
+                  >
+                    {{ payStstusList[scope.row.pay_status + 1] }}
+                  </el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column label="其他">
+                <el-button type="danger" size="small">取消</el-button>
+                <el-button type="success" size="small">重新支付</el-button>
+              </el-table-column>
+            </el-table>
           </div>
           <div class="page-container">
             <el-pagination
               :current-page="params.page"
-              :page-size="10"
+              :page-size="params.pageSize"
               :disabled="false"
               layout="total,prev,pager,next"
               :total="total"
-              @size-change="handleSizeChange"
               @current-change="handleCurrentChange"
             />
           </div>
