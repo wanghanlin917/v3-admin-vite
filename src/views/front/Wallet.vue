@@ -105,12 +105,14 @@ const indexMethod = (val: number) => {
   // console.log(val)
   return (params.value.page - 1) * params.value.pageSize + val + 1
 }
-const handleCurrentChange = async (val: number) => {
+const handleCurrentChange = (val: number) => {
   // console.log(`current page: ${val}`)
   // console.log("page", val)
   params.value.page = val
   // console.log("params", params)
   initTableDateApi()
+  console.log("handle", params.value)
+
   // await tableDateApi(params.value).then((res) => {
   //   console.log(res)
   //   tableData.value = res.data.data
@@ -126,8 +128,19 @@ const InitWallet = async () => {
   })
 }
 const initTableDateApi = async () => {
-  await tableDateApi(params.value).then((res) => {
-    console.log("inittable", res)
+  if (params.value.date_info) {
+    searchDate.value = {
+      ...params.value,
+      date_range: params.value.date_info[0],
+      date_range_end: params.value.date_info[1]
+    }
+  } else {
+    searchDate.value = { ...params.value }
+  }
+  delete searchDate.value.date_info
+  await tableDateApi(searchDate.value).then((res) => {
+    // console.log("initTable2", params.value)
+    // console.log("inittable", res)
     tableData.value = res.data.data
     total.value = res.data.total
   })
@@ -335,7 +348,7 @@ onMounted(() => {
           </template>
           <div style="margin-top: 20px">
             <el-form :inline="true" :model="params" ref="searchForm">
-              <el-form-item label="交易时间" prop="date_range">
+              <el-form-item label="交易时间" prop="date_range" style="width: 300px">
                 <el-date-picker
                   v-model="params.date_info"
                   type="daterange"
