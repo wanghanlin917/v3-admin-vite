@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { ref } from "vue"
+import { ref, onMounted } from "vue"
+import { OrderInfoApi } from "@/api/order/index"
+
 const fromDate = ref<any>({
   from_addr: "",
   from_name: "",
@@ -28,13 +30,20 @@ const shortcuts = [
 ]
 const toDate = ref<any>({
   to_addr: "",
+  to_name: "",
   to_mobile: "",
   to_date: ""
 })
 const toDateError = ref<any>({
-  to_to_addr: "",
+  to_addr: "",
+  to_name: "",
   to_mobile: "",
   to_date: ""
+})
+const page = ref<any>({
+  page: 1,
+  totalCount: 1,
+  pageize: 10
 })
 const goodInfo = ref<any>({
   goods_type: "",
@@ -60,6 +69,7 @@ const goodInfoError = ref<any>({
   remark: ""
 })
 const showDrawer = ref<boolean>(false)
+const clickAddressField = ref<string>("")
 const tableData = ref<any>([
   {
     name: "2016-05-03",
@@ -67,14 +77,51 @@ const tableData = ref<any>([
     addr: "北京朝阳区"
   }
 ])
+const doSelectAddress = (res: any) => {
+  if (clickAddressField.value === "from") {
+    for (const key of Object.keys(res)) {
+      console.log(key)
+
+      const filed: any = `${clickAddressField.value}_${key}`
+      fromDate.value[filed] = res[key]
+    }
+  } else if (clickAddressField.value === "to") {
+    for (const key of Object.keys(res)) {
+      console.log(key)
+      const filed: any = `${clickAddressField.value}_${key}`
+      toDate.value[filed] = res[key]
+    }
+  }
+  showDrawer.value = false
+  console.log("doSelect", res)
+  console.log(typeof res)
+
+  // res.map((a: any, b: any) => {
+  //   console.log(a, b)
+  // })
+}
+const doChangePage = (val: number) => {
+  console.log(val)
+}
 const showAddressTable = (type: string) => {
   showDrawer.value = true
   if (type === "from") {
     console.log("from")
+    clickAddressField.value = type
   } else if (type === "to") {
     console.log("to")
+    clickAddressField.value = type
   }
 }
+const initAdressTable = async () => {
+  await OrderInfoApi({ page: page.value.page }).then((res: any) => {
+    tableData.value = res.data.data
+    console.log("initAdress", res.data)
+  })
+}
+onMounted(() => {
+  initAdressTable()
+})
 </script>
 <template>
   <el-card class="box-card" shadow="never" style="min-width: 1120px">
@@ -135,8 +182,8 @@ const showAddressTable = (type: string) => {
               收货地
             </h5>
             <el-form label-width="80px" style="max-width: 500px">
-              <el-form-item label="收货地址" :error="toDateError.addr">
-                <el-input v-model="toDate.addr">
+              <el-form-item label="收货地址" :error="toDateError.to_addr">
+                <el-input v-model="toDate.to_addr">
                   <template #append>
                     <el-button style="font-weight: 400" @click="showAddressTable('to')">地址库 </el-button>
                   </template>
@@ -237,6 +284,16 @@ const showAddressTable = (type: string) => {
         </template>
       </el-table-column>
     </el-table>
+    <div style="margin-top: 20px; float: right">
+      <el-pagination
+        :current-page="page.page"
+        :total="page.totalCount"
+        :page-size="page.pageSize"
+        background
+        layout="prev, pager, next,jumper"
+        @current-change="doChangePage"
+      />
+    </div>
   </el-drawer>
 </template>
 
