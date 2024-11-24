@@ -41,14 +41,13 @@ function createService() {
         case 0:
           // 本系统采用 code === 0 来表示没有业务错误
           console.log("响应拦截器数据", apiData)
-
           return apiData
         case 401:
           // Token 过期时
           return logout()
+        case -1:
+          return apiData
         default:
-          // 不是正确的 code
-          ElMessage.error(apiData.message || "Error")
           return Promise.reject(new Error("Error"))
       }
     },

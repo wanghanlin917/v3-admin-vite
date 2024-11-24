@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
-import { OrderInfoApi } from "@/api/order/index"
+import { OrderInfoApi, PublishApi } from "@/api/order/index"
+import { ElMessage } from "element-plus"
+import { couldStartTrivia } from "typescript"
 
+const showDrawer = ref(false)
+const clickAddressField = ref<string>("")
 const fromDate = ref<any>({
   from_addr: "",
   from_name: "",
@@ -68,8 +72,6 @@ const goodInfoError = ref<any>({
   cost: "",
   remark: ""
 })
-const showDrawer = ref<boolean>(false)
-const clickAddressField = ref<string>("")
 const tableData = ref<any>([
   {
     name: "2016-05-03",
@@ -77,6 +79,108 @@ const tableData = ref<any>([
     addr: "北京朝阳区"
   }
 ])
+const doPublish = async () => {
+  // console.log(typeof { ...toDate, ...fromDate, ...goodInfo })
+  clearFormError(toDateError.value)
+  clearFormError(fromDateError.value)
+  clearFormError(goodInfoError.value)
+  await PublishApi({ ...toDate.value, ...fromDate.value, ...goodInfo.value })
+    .then((res) => {
+      console.log(res)
+
+      if (res.code === -1) {
+        const {
+          cost,
+          from_addr,
+          from_date,
+          from_mobile,
+          from_name,
+          goods_type,
+          title,
+          to_addr,
+          to_date,
+          to_mobile,
+          to_name,
+          unit_price,
+          weight
+        }: {
+          cost?: any
+          from_addr?: any
+          from_date?: any
+          from_mobile?: any
+          from_name?: any
+          goods_type?: any
+          title?: any
+          to_addr?: any
+          to_date?: any
+          to_mobile?: any
+          to_name?: any
+          unit_price?: any
+          weight?: any
+        } = { ...res.message }
+        toDateError.value = {
+          to_addr: to_addr ? to_addr[0] : "",
+          to_name: to_name ? to_name : "",
+          to_mobile: to_mobile ? to_mobile[0] : "",
+          to_date: to_date ? to_date[0] : ""
+        }
+        fromDateError.value = {
+          from_addr: from_addr ? from_addr[0] : "",
+          from_name: from_name ? from_name[0] : "",
+          from_date: from_date ? from_date[0] : "",
+          from_mobile: from_mobile ? from_mobile[0] : ""
+        }
+        goodInfoError.value = {
+          cost: cost ? cost[0] : "",
+          goods_type: goods_type ? goods_type[0] : "",
+          title: title ? title[0] : "",
+          unit_price: unit_price ? unit_price[0] : "",
+          weight: weight ? weight[0] : ""
+        }
+        // validateFormError(toDateError.value, {
+        //   to_addr,
+        //   to_name,
+        //   to_mobile,
+        //   to_date
+        // })
+        // validateFormError(fromDateError.value, {
+        //   from_addr,
+        //   from_name,
+        //   from_date,
+        //   from_mobile
+        // })
+        // validateFormError(goodInfoError.value, {
+        //   cost,
+        //   goods_type,
+        //   title,
+        //   unit_price,
+        //   weight
+        // })
+        return
+      }
+      ElMessage.success("发布成功")
+      // console.log("ok", res)
+    })
+    .catch((res) => {
+      // console.log("error", res)
+
+      // for (const key of Object.keys(res.message)) {
+      //   console.log(res.message[key])
+      // }
+      console.log("error", res)
+    })
+}
+function clearFormError(errorDict: any) {
+  for (const key of Object.keys(errorDict)) {
+    errorDict[key] = ""
+  }
+}
+function validateFormError(errorDict: any, resError: any) {
+  for (const key in resError) {
+    const txt: any = resError[key][0]
+    errorDict[key] = txt
+  }
+}
 const doSelectAddress = (res: any) => {
   if (clickAddressField.value === "from") {
     for (const key of Object.keys(res)) {
@@ -95,22 +199,20 @@ const doSelectAddress = (res: any) => {
   showDrawer.value = false
   console.log("doSelect", res)
   console.log(typeof res)
-
-  // res.map((a: any, b: any) => {
-  //   console.log(a, b)
-  // })
 }
 const doChangePage = (val: number) => {
   console.log(val)
+  page.value.page = val
+  initAdressTable()
 }
-const showAddressTable = (type: string) => {
+function showAddressTable(value: string) {
   showDrawer.value = true
-  if (type === "from") {
+  if (value === "from") {
     console.log("from")
-    clickAddressField.value = type
-  } else if (type === "to") {
+    clickAddressField.value = "from"
+  } else if (value === "to") {
     console.log("to")
-    clickAddressField.value = type
+    clickAddressField.value = "to"
   }
 }
 const initAdressTable = async () => {
@@ -142,7 +244,7 @@ onMounted(() => {
               发货地
             </h5>
             <el-form label-width="80px" style="max-width: 500px">
-              <el-form-item label="发货地址" :error="fromDateError.addr">
+              <el-form-item label="发货地址" :error="fromDateError.from_addr">
                 <el-input v-model="fromDate.from_addr">
                   <template #append>
                     <el-button style="font-weight: 400" @click="showAddressTable('from')"> 地址库 </el-button>
@@ -206,7 +308,6 @@ onMounted(() => {
                   v-model="toDate.to_date"
                   type="date"
                   placeholder="计划发货时间"
-                  :disabled-date="disabledDate"
                   :shortcuts="shortcuts"
                   format="YYYY-MM-DD"
                   value-format="YYYY-MM-DD"
@@ -272,29 +373,29 @@ onMounted(() => {
         <el-button type="primary" style="width: 200px; height: 40px" @click="doPublish()">发布运单</el-button>
       </el-row>
     </div>
+    <el-drawer v-model="showDrawer" title="我的地址库" direction="rtl" size="40%">
+      <el-table :data="tableData">
+        <el-table-column property="name" label="姓名" />
+        <el-table-column property="mobile" label="手机号" />
+        <el-table-column property="addr" label="地址" :show-overflow-tooltip="true" />
+        <el-table-column label="选项" fixed="right">
+          <template #default="scope">
+            <el-button size="small" type="primary" @click="doSelectAddress(scope.row)">选择</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div style="margin-top: 20px; float: right">
+        <el-pagination
+          :current-page="page.page"
+          :total="page.totalCount"
+          :page-size="page.pageSize"
+          background
+          layout="prev, pager, next,jumper"
+          @current-change="doChangePage"
+        />
+      </div>
+    </el-drawer>
   </el-card>
-  <el-drawer v-model="showDrawer" title="我的地址库" direction="rtl" size="40%">
-    <el-table :data="tableData">
-      <el-table-column property="name" label="姓名" />
-      <el-table-column property="mobile" label="手机号" />
-      <el-table-column property="addr" label="地址" :show-overflow-tooltip="true" />
-      <el-table-column label="选项" fixed="right">
-        <template #default="scope">
-          <el-button size="small" type="primary" @click="doSelectAddress(scope.row)">选择</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <div style="margin-top: 20px; float: right">
-      <el-pagination
-        :current-page="page.page"
-        :total="page.totalCount"
-        :page-size="page.pageSize"
-        background
-        layout="prev, pager, next,jumper"
-        @current-change="doChangePage"
-      />
-    </div>
-  </el-drawer>
 </template>
 
 <style scoped></style>

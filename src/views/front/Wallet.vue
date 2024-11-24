@@ -45,6 +45,10 @@ const state = ref<WalletRequestData>({
     {
       value: -1,
       label: "提现"
+    },
+    {
+      value: 2,
+      label: "下单"
     }
   ]
 })
@@ -67,7 +71,7 @@ const params = ref<{
 const total = ref<number>(0)
 const tableData = ref<any>()
 const payStstusList = ref<string[]>(["已取消", "未支付", "已支付"])
-const tranTypeList = ref<string[]>(["提现", "", "充值"])
+const tranTypeList = ref<string[]>(["提现", "", "充值", "下单", "取消"])
 const searchDate = ref<any>()
 
 const doSearchReset = () => {
