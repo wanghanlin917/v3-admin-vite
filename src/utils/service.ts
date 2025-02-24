@@ -3,7 +3,7 @@ import { useUserStoreHook } from "@/store/modules/user"
 import { ElMessage } from "element-plus"
 import { get, merge } from "lodash-es"
 import { getToken } from "./cache/cookies"
-// import { log } from "console"
+import { log } from "console"
 
 /** 退出登录并强制刷新页面（会重定向到登录页） */
 function logout() {
@@ -33,6 +33,7 @@ function createService() {
       // 这个 code 是和后端约定的业务 code
       const code = apiData.code
       // 如果没有 code, 代表这不是项目后端开发的 api
+
       if (code === undefined) {
         ElMessage.error("非本系统的接口")
         return Promise.reject(new Error("非本系统的接口"))
